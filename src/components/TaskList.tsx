@@ -11,11 +11,11 @@ import { CategoryFilter } from "@/components/CategoryFilter";
 import { Task, Habit } from "@/types/task";
 import { isSameDay, format } from "date-fns";
 import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-} from "@/components/ui/sheet";
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 interface TaskListProps {
   tasks: Task[];
@@ -223,13 +223,13 @@ export const TaskList = ({ tasks, onUpdateTasks, habits, onUpdateHabits }: TaskL
         )}
       </div>
 
-      {/* New Item Sheet */}
-      <Sheet open={isNewItemSheetOpen} onOpenChange={setIsNewItemSheetOpen}>
-        <SheetContent side="bottom" className="h-auto">
-          <SheetHeader>
-            <SheetTitle>Create New</SheetTitle>
-          </SheetHeader>
-          <div className="grid grid-cols-2 gap-4 mt-6">
+      {/* New Item Dialog */}
+      <Dialog open={isNewItemSheetOpen} onOpenChange={setIsNewItemSheetOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Create New</DialogTitle>
+          </DialogHeader>
+          <div className="grid grid-cols-2 gap-4 mt-2">
             <Card 
               className="p-6 cursor-pointer hover:border-gold transition-all hover:shadow-lg"
               onClick={openNewTaskDialog}
@@ -255,8 +255,8 @@ export const TaskList = ({ tasks, onUpdateTasks, habits, onUpdateHabits }: TaskL
               </div>
             </Card>
           </div>
-        </SheetContent>
-      </Sheet>
+        </DialogContent>
+      </Dialog>
 
       <CreateTaskDialog
         open={isCreateDialogOpen}
