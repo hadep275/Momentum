@@ -6,6 +6,7 @@ import { TaskItem } from "@/components/TaskItem";
 import { CreateTaskDialog } from "@/components/CreateTaskDialog";
 import { CategoryFilter } from "@/components/CategoryFilter";
 import { Task } from "@/types/task";
+import { isSameDay } from "date-fns";
 
 interface TaskListProps {
   tasks: Task[];
@@ -37,10 +38,16 @@ export const TaskList = ({ tasks, onUpdateTasks }: TaskListProps) => {
     onUpdateTasks(tasks.filter((t) => t.id !== taskId));
   };
 
-  // Filter tasks by category
+  // Filter tasks: only show today's tasks
+  const today = new Date();
+  const todaysTasks = tasks.filter((task) => 
+    task.dueDate && isSameDay(task.dueDate, today)
+  );
+
+  // Filter by category
   const filteredTasks = selectedCategory
-    ? tasks.filter((task) => task.categoryId === selectedCategory)
-    : tasks;
+    ? todaysTasks.filter((task) => task.categoryId === selectedCategory)
+    : todaysTasks;
 
   // Smart sorting: time first, then priority
   const sortedTasks = [...filteredTasks].sort((a, b) => {
@@ -74,7 +81,10 @@ export const TaskList = ({ tasks, onUpdateTasks }: TaskListProps) => {
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-semibold">Your Tasks</h2>
+        <div>
+          <h2 className="text-2xl font-semibold">Today's Tasks</h2>
+          <p className="text-sm text-muted-foreground">Focus on what matters today</p>
+        </div>
         <Button onClick={() => setIsCreateDialogOpen(true)} className="gap-2 min-h-[44px]">
           <Plus className="w-4 h-4" />
           New Task
@@ -90,8 +100,10 @@ export const TaskList = ({ tasks, onUpdateTasks }: TaskListProps) => {
         <Card className="p-12 text-center border-2 border-gold bg-card">
           <p className="text-muted-foreground mb-4">
             {selectedCategory 
-              ? "No tasks in this category. Create a new task!"
-              : "No tasks yet. Create your first task to get started!"}
+              ? "No tasks in this category for today."
+              : todaysTasks.length === 0 
+                ? "No tasks scheduled for today. Plan your day!"
+                : "No tasks in this category for today."}
           </p>
           <Button onClick={() => setIsCreateDialogOpen(true)} className="gap-2 bg-gold text-accent-foreground hover:bg-gold/90 border-2 border-copper min-h-[44px]">
             <Plus className="w-4 h-4" />

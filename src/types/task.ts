@@ -30,7 +30,7 @@ export interface Task {
   id: string;
   title: string;
   description?: string;
-  dueDate?: Date;
+  dueDate: Date; // Now required
   dueTime?: string; // HH:mm format
   priority: TaskPriority;
   categoryId?: string;

@@ -36,7 +36,7 @@ export const CreateTaskDialog = ({
 }: CreateTaskDialogProps) => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [dueDate, setDueDate] = useState<Date | undefined>();
+  const [dueDate, setDueDate] = useState<Date | undefined>(new Date()); // Default to today
   const [dueTime, setDueTime] = useState<string>("");
   const [priority, setPriority] = useState<TaskPriority>("medium");
   const [categoryId, setCategoryId] = useState<string | undefined>();
@@ -57,7 +57,7 @@ export const CreateTaskDialog = ({
   };
 
   const handleSubmit = () => {
-    if (!title.trim()) return;
+    if (!title.trim() || !dueDate) return;
 
     const task: Omit<Task, "id" | "createdAt"> = {
       title: title.trim(),
@@ -82,7 +82,7 @@ export const CreateTaskDialog = ({
     // Reset form
     setTitle("");
     setDescription("");
-    setDueDate(undefined);
+    setDueDate(new Date()); // Reset to today
     setDueTime("");
     setPriority("medium");
     setCategoryId(undefined);
@@ -125,14 +125,13 @@ export const CreateTaskDialog = ({
           </div>
 
           <div className="space-y-2">
-            <Label>Due Date</Label>
+            <Label>Due Date *</Label>
             <Popover>
               <PopoverTrigger asChild>
                 <Button
                   variant="outline"
                   className={cn(
-                    "w-full justify-start text-left font-normal",
-                    !dueDate && "text-muted-foreground"
+                    "w-full justify-start text-left font-normal"
                   )}
                 >
                   <CalendarIcon className="mr-2 h-4 w-4" />
@@ -263,7 +262,7 @@ export const CreateTaskDialog = ({
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             Cancel
           </Button>
-          <Button onClick={handleSubmit} disabled={!title.trim()}>
+          <Button onClick={handleSubmit} disabled={!title.trim() || !dueDate}>
             Create Task
           </Button>
         </div>

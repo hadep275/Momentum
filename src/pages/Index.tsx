@@ -20,7 +20,7 @@ const Index = () => {
           ...task,
           priority: task.priority || "medium", // Default to medium if missing
           createdAt: new Date(task.createdAt),
-          dueDate: task.dueDate ? new Date(task.dueDate) : undefined,
+          dueDate: task.dueDate ? new Date(task.dueDate) : new Date(), // Default to today if missing
         }));
       } catch (e) {
         console.error("Failed to parse stored tasks:", e);

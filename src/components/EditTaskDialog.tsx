@@ -72,7 +72,7 @@ export const EditTaskDialog = ({
   };
 
   const handleSubmit = () => {
-    if (!title.trim()) return;
+    if (!title.trim() || !dueDate) return;
 
     const updatedTask: Task = {
       ...task,
@@ -133,14 +133,13 @@ export const EditTaskDialog = ({
           </div>
 
           <div className="space-y-2">
-            <Label>Due Date</Label>
+            <Label>Due Date *</Label>
             <Popover>
               <PopoverTrigger asChild>
                 <Button
                   variant="outline"
                   className={cn(
-                    "w-full justify-start text-left font-normal",
-                    !dueDate && "text-muted-foreground"
+                    "w-full justify-start text-left font-normal"
                   )}
                 >
                   <CalendarIcon className="mr-2 h-4 w-4" />
@@ -271,7 +270,7 @@ export const EditTaskDialog = ({
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             Cancel
           </Button>
-          <Button onClick={handleSubmit} disabled={!title.trim()}>
+          <Button onClick={handleSubmit} disabled={!title.trim() || !dueDate}>
             Save Changes
           </Button>
         </div>
