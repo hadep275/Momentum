@@ -3,6 +3,7 @@ import { Calendar } from "@/components/Calendar";
 import { TaskList } from "@/components/TaskList";
 import { Analytics } from "@/components/Analytics";
 import { AppSettings } from "@/components/AppSettings";
+import { InstallPWA } from "@/components/InstallPWA";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { ListTodo, CalendarDays, BarChart3, Settings } from "lucide-react";
@@ -150,6 +151,8 @@ const Index = () => {
           hideCompletedHabits={hideCompletedHabits}
           onHideCompletedHabitsChange={setHideCompletedHabits}
         />
+
+        <InstallPWA />
       </div>
     </div>
   );
