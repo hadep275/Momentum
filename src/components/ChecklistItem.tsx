@@ -60,7 +60,11 @@ export const ChecklistItem = ({ checklist, onUpdate }: ChecklistItemProps) => {
   };
 
   return (
-    <div className="flex items-center gap-2 p-2 rounded-lg hover:bg-muted transition-colors border border-gold/30">
+    <div className={`flex items-center gap-2 p-3 rounded-lg hover:bg-muted transition-all border ${
+      isTracking 
+        ? "border-primary bg-primary/5 shadow-lg shadow-primary/20" 
+        : "border-gold/30"
+    }`}>
       <Checkbox
         checked={checklist.completed}
         onCheckedChange={handleToggleComplete}
@@ -70,25 +74,37 @@ export const ChecklistItem = ({ checklist, onUpdate }: ChecklistItemProps) => {
         {checklist.title}
       </span>
 
-      <div className="flex items-center gap-2">
-        <div className="flex items-center gap-1 text-xs text-muted-foreground min-w-[60px]">
-          <Clock className="w-3 h-3" />
-          <span className={isTracking ? "text-primary font-semibold" : ""}>
+      <div className="flex items-center gap-3">
+        <div className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md transition-all ${
+          isTracking 
+            ? "bg-primary/10 border border-primary/30" 
+            : "bg-muted/50"
+        }`}>
+          <Clock className={`w-3.5 h-3.5 ${isTracking ? "text-primary animate-pulse" : "text-muted-foreground"}`} />
+          <span className={`text-sm font-mono tabular-nums ${
+            isTracking 
+              ? "text-primary font-bold" 
+              : "text-foreground"
+          }`}>
             {formatTime(currentTime)}
           </span>
         </div>
         
         <Button
-          variant="ghost"
+          variant={isTracking ? "default" : "outline"}
           size="icon"
           onClick={handleToggleTracking}
-          className="h-8 w-8"
+          className={`h-8 w-8 transition-all ${
+            isTracking 
+              ? "bg-primary hover:bg-primary/90 shadow-md" 
+              : ""
+          }`}
           disabled={checklist.completed}
         >
           {isTracking ? (
-            <Pause className="w-3 h-3 text-primary" />
+            <Pause className="w-4 h-4" />
           ) : (
-            <Play className="w-3 h-3" />
+            <Play className="w-4 h-4 ml-0.5" />
           )}
         </Button>
       </div>
