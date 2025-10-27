@@ -129,85 +129,90 @@ export const TaskItem = ({ task, onUpdate, onDelete }: TaskItemProps) => {
   return (
     <Card className="p-4 hover:shadow-xl transition-all border-2 border-gold bg-card shadow-lg shadow-primary/20">
       <div className="space-y-3">
+        {/* Title and Checkbox */}
         <div className="flex items-start gap-3">
           <Checkbox
             checked={task.completed}
             onCheckedChange={handleToggleComplete}
             className="mt-1"
           />
-          
-          <div className="flex-1 space-y-2">
-            <div className="flex items-start justify-between gap-2">
-              <div className="flex-1 space-y-2">
-                <h3 className={`font-semibold ${task.completed ? "line-through text-muted-foreground" : ""}`}>
-                  {task.title}
-                </h3>
-                {task.description && (
-                  <p className="text-sm text-muted-foreground mt-1">{task.description}</p>
-                )}
-                
-                {/* Category and Tags */}
-                <div className="flex flex-wrap gap-2 items-center">
-                  {task.categoryId && (
-                    <CategoryBadge categoryId={task.categoryId} />
-                  )}
-                  {task.tags.map((tag) => (
-                    <TagBadge key={tag} tag={tag} variant="outline" />
-                  ))}
-                </div>
-              </div>
-              
-              <div className="flex items-center gap-2 flex-wrap">
-                <Badge variant={priorityConfig.variant} className="text-xs gap-1">
-                  <priorityConfig.icon className="w-3 h-3" />
-                  {priorityConfig.text}
-                </Badge>
-                {dueDateStatus && (
-                  <Badge variant={dueDateStatus.variant} className="text-xs gap-1">
-                    <Calendar className="w-3 h-3" />
-                    {dueDateStatus.text}
-                  </Badge>
-                )}
-                {getRecurrenceText() && (
-                  <Badge variant="secondary" className="text-xs">
-                    {getRecurrenceText()}
-                  </Badge>
-                )}
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => setIsExpanded(!isExpanded)}
-                >
-                  {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => onDelete(task.id)}
-                  className="text-destructive hover:text-destructive"
-                >
-                  <Trash2 className="w-4 h-4" />
-                </Button>
-              </div>
-            </div>
-
-            {totalChecklists > 0 && (
-              <div className="space-y-2">
-                <div className="flex items-center justify-between text-sm">
-                  <span className="text-muted-foreground">
-                    {completedChecklists}/{totalChecklists} completed
-                  </span>
-                  <div className="flex items-center gap-1 text-muted-foreground">
-                    <Clock className="w-3 h-3" />
-                    <span className="text-xs">{formatTime(totalTimeSpent)}</span>
-                  </div>
-                </div>
-                <Progress value={progress} className="h-2" />
-              </div>
-            )}
-          </div>
+          <h3 className={`flex-1 font-semibold ${task.completed ? "line-through text-muted-foreground" : ""}`}>
+            {task.title}
+          </h3>
         </div>
 
+        {/* Description */}
+        {task.description && (
+          <p className="text-sm text-muted-foreground ml-9">{task.description}</p>
+        )}
+
+        {/* Badges: Priority, Due Date, Recurrence */}
+        <div className="flex flex-wrap gap-2 ml-9">
+          <Badge variant={priorityConfig.variant} className="text-xs gap-1">
+            <priorityConfig.icon className="w-3 h-3" />
+            {priorityConfig.text}
+          </Badge>
+          {dueDateStatus && (
+            <Badge variant={dueDateStatus.variant} className="text-xs gap-1">
+              <Calendar className="w-3 h-3" />
+              {dueDateStatus.text}
+            </Badge>
+          )}
+          {getRecurrenceText() && (
+            <Badge variant="secondary" className="text-xs">
+              {getRecurrenceText()}
+            </Badge>
+          )}
+        </div>
+
+        {/* Category and Tags */}
+        {(task.categoryId || task.tags.length > 0) && (
+          <div className="flex flex-wrap gap-2 items-center ml-9">
+            {task.categoryId && (
+              <CategoryBadge categoryId={task.categoryId} />
+            )}
+            {task.tags.map((tag) => (
+              <TagBadge key={tag} tag={tag} variant="outline" />
+            ))}
+          </div>
+        )}
+
+        {/* Action Buttons */}
+        <div className="flex justify-end gap-2 ml-9">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setIsExpanded(!isExpanded)}
+          >
+            {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => onDelete(task.id)}
+            className="text-destructive hover:text-destructive"
+          >
+            <Trash2 className="w-4 h-4" />
+          </Button>
+        </div>
+
+        {/* Progress and Checklist Info */}
+        {totalChecklists > 0 && (
+          <div className="space-y-2 ml-9">
+            <div className="flex items-center justify-between text-sm">
+              <span className="text-muted-foreground">
+                {completedChecklists}/{totalChecklists} completed
+              </span>
+              <div className="flex items-center gap-1 text-muted-foreground">
+                <Clock className="w-3 h-3" />
+                <span className="text-xs">{formatTime(totalTimeSpent)}</span>
+              </div>
+            </div>
+            <Progress value={progress} className="h-2" />
+          </div>
+        )}
+
+        {/* Expanded Checklist Items */}
         {isExpanded && totalChecklists > 0 && (
           <div className="ml-9 space-y-2 pt-2 border-t">
             {task.checklists.map((checklist) => (
