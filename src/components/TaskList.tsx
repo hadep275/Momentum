@@ -106,6 +106,7 @@ export const TaskList = ({ tasks, onUpdateTasks }: TaskListProps) => {
               task={task}
               onUpdate={handleUpdateTask}
               onDelete={handleDeleteTask}
+              existingTags={allTags}
             />
           ))}
         </div>

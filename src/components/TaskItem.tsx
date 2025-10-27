@@ -4,21 +4,24 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
-import { ChevronDown, ChevronUp, Trash2, Clock, Calendar, AlertCircle } from "lucide-react";
+import { ChevronDown, ChevronUp, Trash2, Clock, Calendar, AlertCircle, Pencil } from "lucide-react";
 import { Task } from "@/types/task";
 import { ChecklistItem } from "@/components/ChecklistItem";
 import { CategoryBadge } from "@/components/CategoryBadge";
 import { TagBadge } from "@/components/TagBadge";
+import { EditTaskDialog } from "@/components/EditTaskDialog";
 import { formatDistanceToNow, isPast, differenceInDays, format } from "date-fns";
 
 interface TaskItemProps {
   task: Task;
   onUpdate: (task: Task) => void;
   onDelete: (taskId: string) => void;
+  existingTags?: string[];
 }
 
-export const TaskItem = ({ task, onUpdate, onDelete }: TaskItemProps) => {
+export const TaskItem = ({ task, onUpdate, onDelete, existingTags = [] }: TaskItemProps) => {
   const [isExpanded, setIsExpanded] = useState(false);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
 
   const completedChecklists = task.checklists.filter((c) => c.completed).length;
   const totalChecklists = task.checklists.length;
@@ -182,6 +185,13 @@ export const TaskItem = ({ task, onUpdate, onDelete }: TaskItemProps) => {
           <Button
             variant="ghost"
             size="icon"
+            onClick={() => setIsEditDialogOpen(true)}
+          >
+            <Pencil className="w-4 h-4" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
             onClick={() => setIsExpanded(!isExpanded)}
           >
             {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
@@ -225,6 +235,14 @@ export const TaskItem = ({ task, onUpdate, onDelete }: TaskItemProps) => {
           </div>
         )}
       </div>
+
+      <EditTaskDialog
+        open={isEditDialogOpen}
+        onOpenChange={setIsEditDialogOpen}
+        onUpdateTask={onUpdate}
+        task={task}
+        existingTags={existingTags}
+      />
     </Card>
   );
 };
