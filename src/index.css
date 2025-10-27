@@ -8,95 +8,95 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    --background: 340 45% 97%;
-    --foreground: 340 60% 15%;
+    --background: 340 40% 18%;
+    --foreground: 340 30% 96%;
 
-    --card: 340 60% 98%;
-    --card-foreground: 340 60% 15%;
+    --card: 340 35% 22%;
+    --card-foreground: 340 30% 96%;
 
-    --popover: 340 55% 96%;
-    --popover-foreground: 340 60% 15%;
+    --popover: 340 35% 20%;
+    --popover-foreground: 340 30% 96%;
 
-    --primary: 345 75% 55%;
-    --primary-foreground: 0 0% 100%;
+    --primary: 345 70% 55%;
+    --primary-foreground: 340 30% 96%;
 
-    --secondary: 15 70% 75%;
-    --secondary-foreground: 340 60% 15%;
+    --secondary: 15 60% 45%;
+    --secondary-foreground: 340 30% 96%;
 
-    --muted: 340 50% 92%;
-    --muted-foreground: 340 30% 40%;
+    --muted: 340 25% 24%;
+    --muted-foreground: 340 25% 75%;
 
-    --accent: 28 75% 65%;
-    --accent-foreground: 0 0% 100%;
+    --accent: 28 65% 50%;
+    --accent-foreground: 340 30% 96%;
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 0 0% 100%;
+    --destructive: 0 70% 50%;
+    --destructive-foreground: 340 30% 96%;
 
-    --border: 340 45% 88%;
-    --input: 340 40% 94%;
-    --ring: 345 75% 55%;
+    --border: 340 25% 28%;
+    --input: 340 25% 26%;
+    --ring: 345 70% 55%;
 
     --radius: 0.75rem;
 
-    --sidebar-background: 340 55% 96%;
-    --sidebar-foreground: 340 60% 20%;
-    --sidebar-primary: 345 75% 55%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 340 50% 92%;
-    --sidebar-accent-foreground: 340 60% 20%;
-    --sidebar-border: 340 45% 88%;
-    --sidebar-ring: 345 75% 55%;
+    --sidebar-background: 340 35% 20%;
+    --sidebar-foreground: 340 30% 92%;
+    --sidebar-primary: 345 70% 55%;
+    --sidebar-primary-foreground: 340 30% 96%;
+    --sidebar-accent: 340 25% 24%;
+    --sidebar-accent-foreground: 340 30% 92%;
+    --sidebar-border: 340 25% 28%;
+    --sidebar-ring: 345 70% 55%;
 
-    --copper: 28 75% 65%;
-    --gold: 45 90% 65%;
-    --rose-gold: 15 75% 75%;
-    --rose-pink: 345 75% 70%;
-    --dusty-pink: 340 55% 80%;
+    --copper: 28 70% 52%;
+    --gold: 45 85% 55%;
+    --rose-gold: 15 70% 60%;
+    --rose-pink: 345 70% 65%;
+    --dusty-pink: 340 45% 58%;
   }
 
   .dark {
-    --background: 340 35% 12%;
-    --foreground: 340 40% 95%;
+    --background: 340 40% 18%;
+    --foreground: 340 30% 96%;
 
-    --card: 340 30% 16%;
-    --card-foreground: 340 40% 95%;
+    --card: 340 35% 22%;
+    --card-foreground: 340 30% 96%;
 
-    --popover: 340 30% 14%;
-    --popover-foreground: 340 40% 95%;
+    --popover: 340 35% 20%;
+    --popover-foreground: 340 30% 96%;
 
-    --primary: 345 70% 60%;
-    --primary-foreground: 0 0% 100%;
+    --primary: 345 70% 55%;
+    --primary-foreground: 340 30% 96%;
 
-    --secondary: 15 60% 50%;
-    --secondary-foreground: 0 0% 100%;
+    --secondary: 15 60% 45%;
+    --secondary-foreground: 340 30% 96%;
 
-    --muted: 340 25% 22%;
-    --muted-foreground: 340 30% 65%;
+    --muted: 340 25% 24%;
+    --muted-foreground: 340 25% 75%;
 
-    --accent: 28 65% 55%;
-    --accent-foreground: 0 0% 100%;
+    --accent: 28 65% 50%;
+    --accent-foreground: 340 30% 96%;
 
-    --destructive: 0 70% 55%;
-    --destructive-foreground: 0 0% 100%;
+    --destructive: 0 70% 50%;
+    --destructive-foreground: 340 30% 96%;
 
-    --border: 340 25% 24%;
-    --input: 340 25% 20%;
-    --ring: 345 70% 60%;
+    --border: 340 25% 28%;
+    --input: 340 25% 26%;
+    --ring: 345 70% 55%;
 
-    --sidebar-background: 340 30% 14%;
-    --sidebar-foreground: 340 35% 88%;
-    --sidebar-primary: 345 70% 60%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 340 25% 22%;
-    --sidebar-accent-foreground: 340 35% 88%;
-    --sidebar-border: 340 25% 24%;
-    --sidebar-ring: 345 70% 60%;
+    --sidebar-background: 340 35% 20%;
+    --sidebar-foreground: 340 30% 92%;
+    --sidebar-primary: 345 70% 55%;
+    --sidebar-primary-foreground: 340 30% 96%;
+    --sidebar-accent: 340 25% 24%;
+    --sidebar-accent-foreground: 340 30% 92%;
+    --sidebar-border: 340 25% 28%;
+    --sidebar-ring: 345 70% 55%;
 
-    --copper: 28 65% 55%;
-    --gold: 45 85% 60%;
-    --rose-gold: 15 65% 65%;
-    --rose-pink: 345 65% 60%;
-    --dusty-pink: 340 45% 60%;
+    --copper: 28 70% 52%;
+    --gold: 45 85% 55%;
+    --rose-gold: 15 70% 60%;
+    --rose-pink: 345 70% 65%;
+    --dusty-pink: 340 45% 58%;
   }
 }
 
@@ -106,6 +106,10 @@ All colors MUST be HSL.
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply text-foreground;
+    background:
+      radial-gradient(1200px 600px at 0% -10%, hsl(var(--rose-pink) / 0.35), transparent 60%),
+      radial-gradient(1000px 500px at 100% 0%, hsl(var(--gold) / 0.18), transparent 60%),
+      linear-gradient(135deg, hsl(var(--background)) 0%, hsl(var(--secondary)) 50%, hsl(var(--background)) 100%);
   }
 }
