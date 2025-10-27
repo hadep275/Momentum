@@ -456,20 +456,24 @@ export const Calendar = ({ tasks, habits, onUpdateTasks, onUpdateHabits }: Calen
       </Dialog>
 
       {/* Edit Dialogs */}
-      <EditTaskDialog
-        open={!!editingTask}
-        onOpenChange={(open) => !open && setEditingTask(null)}
-        task={editingTask}
-        onUpdateTask={handleUpdateTask}
-        existingTags={allTags}
-      />
+      {editingTask && (
+        <EditTaskDialog
+          open={true}
+          onOpenChange={(open) => !open && setEditingTask(null)}
+          task={editingTask}
+          onUpdateTask={handleUpdateTask}
+          existingTags={allTags}
+        />
+      )}
 
-      <EditHabitDialog
-        open={!!editingHabit}
-        onOpenChange={(open) => !open && setEditingHabit(null)}
-        habit={editingHabit}
-        onUpdateHabit={handleUpdateHabit}
-      />
+      {editingHabit && (
+        <EditHabitDialog
+          open={true}
+          onOpenChange={(open) => !open && setEditingHabit(null)}
+          habit={editingHabit}
+          onUpdateHabit={handleUpdateHabit}
+        />
+      )}
     </div>
   );
 };
