@@ -61,7 +61,7 @@ export const TaskItem = ({ task, onUpdate, onDelete }: TaskItemProps) => {
   };
 
   return (
-    <Card className="p-4 hover:shadow-md transition-shadow border-l-4 border-l-primary">
+    <Card className="p-4 hover:shadow-lg transition-all border-l-4 border-l-primary bg-gradient-to-r from-card to-rose-gold/5">
       <div className="space-y-3">
         <div className="flex items-start gap-3">
           <Checkbox
