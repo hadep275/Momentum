@@ -79,6 +79,26 @@ export const Calendar = ({ tasks, habits, onUpdateTasks }: CalendarProps) => {
   const selectedDateHabits = selectedDate ? getHabitsForDate(selectedDate) : [];
   const selectedDateFormatted = selectedDate ? format(selectedDate, "yyyy-MM-dd") : "";
 
+  // Sort tasks by time
+  const sortedSelectedTasks = [...selectedDateTasks].sort((a, b) => {
+    if (a.dueTime && b.dueTime) {
+      return a.dueTime.localeCompare(b.dueTime);
+    }
+    if (a.dueTime && !b.dueTime) return -1;
+    if (!a.dueTime && b.dueTime) return 1;
+    return 0;
+  });
+
+  // Sort habits by time
+  const sortedSelectedHabits = [...selectedDateHabits].sort((a, b) => {
+    if (a.time && b.time) {
+      return a.time.localeCompare(b.time);
+    }
+    if (a.time && !b.time) return -1;
+    if (!a.time && b.time) return 1;
+    return 0;
+  });
+
   const getCategoryColor = (categoryId?: string) => {
     const category = TASK_CATEGORIES.find((c) => c.id === categoryId);
     return category?.color || "gold";
@@ -203,7 +223,7 @@ export const Calendar = ({ tasks, habits, onUpdateTasks }: CalendarProps) => {
                   <Badge variant="secondary">{selectedDateTasks.length}</Badge>
                 </h3>
                 <div className="space-y-2">
-                  {selectedDateTasks.map((task) => (
+                  {sortedSelectedTasks.map((task) => (
                     <Card
                       key={task.id}
                       className="p-4 hover:border-gold/50 transition-colors"
@@ -276,7 +296,7 @@ export const Calendar = ({ tasks, habits, onUpdateTasks }: CalendarProps) => {
                   <Badge variant="secondary">{selectedDateHabits.length}</Badge>
                 </h3>
                 <div className="space-y-2">
-                  {selectedDateHabits.map((habit) => {
+                  {sortedSelectedHabits.map((habit) => {
                     const isCompletedOnDate = habit.completions.some(
                       (c) => c.date === selectedDateFormatted
                     );

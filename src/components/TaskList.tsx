@@ -127,6 +127,22 @@ export const TaskList = ({ tasks, onUpdateTasks, habits, onUpdateHabits, hideCom
     ? filteredHabits.filter((h) => !h.isCompletedToday)
     : filteredHabits;
 
+  // Sort habits by time (habits with time come first, sorted chronologically)
+  const sortedHabits = [...visibleHabits].sort((a, b) => {
+    const timeA = a.habit.time;
+    const timeB = b.habit.time;
+    
+    // If both have time, sort by time
+    if (timeA && timeB) {
+      return timeA.localeCompare(timeB);
+    }
+    // If only one has time, it comes first
+    if (timeA && !timeB) return -1;
+    if (!timeA && timeB) return 1;
+    // If neither has time, maintain original order
+    return 0;
+  });
+
   // Filter by category
   const filteredTasks = selectedCategory
     ? todaysTasks.filter((task) => task.categoryId === selectedCategory)
@@ -224,7 +240,7 @@ export const TaskList = ({ tasks, onUpdateTasks, habits, onUpdateHabits, hideCom
           </Card>
         ) : (
           <div className="space-y-3">
-            {visibleHabits.map(({ habit, isCompletedToday }) => (
+            {sortedHabits.map(({ habit, isCompletedToday }) => (
               <HabitItem
                 key={habit.id}
                 habit={habit}
