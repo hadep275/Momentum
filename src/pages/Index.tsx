@@ -1,6 +1,7 @@
 import { Calendar } from "@/components/Calendar";
 import { TaskList } from "@/components/TaskList";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ListTodo, CalendarDays, BarChart3 } from "lucide-react";
 
 const Index = () => {
   return (
@@ -30,9 +31,15 @@ const Index = () => {
 
           {/* Fixed Bottom Navigation */}
           <TabsList className="fixed bottom-0 left-0 right-0 grid grid-cols-3 h-16 rounded-none border-t bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
-            <TabsTrigger value="tasks" className="h-full">Tasks</TabsTrigger>
-            <TabsTrigger value="calendar" className="h-full">Calendar</TabsTrigger>
-            <TabsTrigger value="analytics" className="h-full">Analytics</TabsTrigger>
+            <TabsTrigger value="tasks" className="h-full">
+              <ListTodo className="h-6 w-6" />
+            </TabsTrigger>
+            <TabsTrigger value="calendar" className="h-full">
+              <CalendarDays className="h-6 w-6" />
+            </TabsTrigger>
+            <TabsTrigger value="analytics" className="h-full">
+              <BarChart3 className="h-6 w-6" />
+            </TabsTrigger>
           </TabsList>
         </Tabs>
       </div>
