@@ -95,7 +95,7 @@ export const CreateTaskDialog = ({
           </DialogDescription>
         </DialogHeader>
 
-        <ScrollArea className="flex-1 px-6 overflow-y-auto">
+        <ScrollArea className="flex-1 px-6 overflow-y-auto overflow-x-visible">
           <div className="space-y-4 pb-4 pr-2">
           <div className="space-y-2">
             <Label htmlFor="title">Task Title *</Label>
