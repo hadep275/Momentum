@@ -95,7 +95,7 @@ export const CreateTaskDialog = ({
           </DialogDescription>
         </DialogHeader>
 
-        <ScrollArea className="flex-1 px-4 sm:px-6 overflow-y-auto">
+        <ScrollArea className="flex-1 pl-5 pr-4 sm:px-6 overflow-y-auto">
           <div className="space-y-4 pb-4 pr-3">
           <div className="space-y-2">
             <Label htmlFor="title">Task Title *</Label>
@@ -232,7 +232,7 @@ export const CreateTaskDialog = ({
           </div>
         </ScrollArea>
 
-        <div className="flex justify-end gap-2 px-4 sm:px-6 pb-6 border-t pt-4">
+        <div className="flex justify-end gap-2 pl-5 pr-4 sm:px-6 pb-6 border-t pt-4">
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             Cancel
           </Button>
