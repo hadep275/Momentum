@@ -1,9 +1,14 @@
+import { useState } from "react";
 import { Calendar } from "@/components/Calendar";
 import { TaskList } from "@/components/TaskList";
+import { TagManagement } from "@/components/TagManagement";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ListTodo, CalendarDays, BarChart3 } from "lucide-react";
+import { Task } from "@/types/task";
 
 const Index = () => {
+  const [tasks, setTasks] = useState<Task[]>([]);
+
   return (
     <div className="min-h-screen bg-background pb-20">
       <div className="container mx-auto py-8 px-4">
@@ -16,7 +21,7 @@ const Index = () => {
 
         <Tabs defaultValue="tasks" className="w-full">
           <TabsContent value="tasks" className="space-y-4">
-            <TaskList />
+            <TaskList tasks={tasks} onUpdateTasks={setTasks} />
           </TabsContent>
 
           <TabsContent value="calendar" className="space-y-4">
@@ -24,9 +29,7 @@ const Index = () => {
           </TabsContent>
 
           <TabsContent value="analytics" className="space-y-4">
-            <div className="text-center py-12 text-muted-foreground">
-              Analytics coming soon...
-            </div>
+            <TagManagement tasks={tasks} onUpdateTasks={setTasks} />
           </TabsContent>
 
           {/* Fixed Bottom Navigation */}

@@ -7,8 +7,12 @@ import { CreateTaskDialog } from "@/components/CreateTaskDialog";
 import { CategoryFilter } from "@/components/CategoryFilter";
 import { Task } from "@/types/task";
 
-export const TaskList = () => {
-  const [tasks, setTasks] = useState<Task[]>([]);
+interface TaskListProps {
+  tasks: Task[];
+  onUpdateTasks: (tasks: Task[]) => void;
+}
+
+export const TaskList = ({ tasks, onUpdateTasks }: TaskListProps) => {
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
@@ -21,16 +25,16 @@ export const TaskList = () => {
       id: crypto.randomUUID(),
       createdAt: new Date(),
     };
-    setTasks([...tasks, newTask]);
+    onUpdateTasks([...tasks, newTask]);
     setIsCreateDialogOpen(false);
   };
 
   const handleUpdateTask = (updatedTask: Task) => {
-    setTasks(tasks.map((t) => (t.id === updatedTask.id ? updatedTask : t)));
+    onUpdateTasks(tasks.map((t) => (t.id === updatedTask.id ? updatedTask : t)));
   };
 
   const handleDeleteTask = (taskId: string) => {
-    setTasks(tasks.filter((t) => t.id !== taskId));
+    onUpdateTasks(tasks.filter((t) => t.id !== taskId));
   };
 
   // Filter tasks by category

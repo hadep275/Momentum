@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
+import { VoiceTextarea } from "@/components/VoiceTextarea";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Calendar } from "@/components/ui/calendar";
@@ -109,11 +109,11 @@ export const CreateTaskDialog = ({
 
           <div className="space-y-2">
             <Label htmlFor="description">Description</Label>
-            <Textarea
+            <VoiceTextarea
               id="description"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="Add task description (optional)"
+              placeholder="Add task description (optional) - Use mic for voice input"
             />
           </div>
 
