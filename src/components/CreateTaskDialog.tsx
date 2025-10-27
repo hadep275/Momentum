@@ -13,12 +13,13 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Plus, X, CalendarIcon, Clock } from "lucide-react";
+import { Plus, X, CalendarIcon } from "lucide-react";
 import { Task, TASK_CATEGORIES, TaskPriority } from "@/types/task";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { TagInput } from "@/components/TagInput";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { TimePicker } from "@/components/TimePicker";
 
 interface CreateTaskDialogProps {
   open: boolean;
@@ -149,19 +150,11 @@ export const CreateTaskDialog = ({
             </Popover>
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="dueTime">Due Time (Optional)</Label>
-            <div className="relative">
-              <Clock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                id="dueTime"
-                type="time"
-                value={dueTime}
-                onChange={(e) => setDueTime(e.target.value)}
-                className="pl-10"
-              />
-            </div>
-          </div>
+          <TimePicker
+            value={dueTime}
+            onChange={setDueTime}
+            label="Due Time (Optional)"
+          />
 
           <div className="space-y-2">
             <Label htmlFor="priority">Priority</Label>
