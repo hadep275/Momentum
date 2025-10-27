@@ -93,7 +93,7 @@ const Index = () => {
               <h1 className="text-5xl font-bold text-gold drop-shadow-lg">
                 Momentum
               </h1>
-              <p className="text-foreground mt-2 text-lg">Build your best self, one task at a time</p>
+              <p className="text-foreground mt-2 text-lg">Build your best self, one day at a time</p>
             </div>
             <Button
               variant="ghost"
