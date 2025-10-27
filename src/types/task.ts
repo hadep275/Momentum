@@ -13,6 +13,17 @@ export const TASK_CATEGORIES: TaskCategory[] = [
   { id: "learning", name: "Learning", color: "secondary", icon: "BookOpen" },
 ];
 
+export const PRESET_TAGS = [
+  "urgent",
+  "important",
+  "quick-win",
+  "long-term",
+  "review",
+  "waiting-on-others",
+  "planning",
+  "routine",
+] as const;
+
 export interface Task {
   id: string;
   title: string;

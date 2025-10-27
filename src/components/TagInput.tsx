@@ -3,6 +3,8 @@ import { Input } from "@/components/ui/input";
 import { TagBadge } from "@/components/TagBadge";
 import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { PRESET_TAGS } from "@/types/task";
 
 interface TagInputProps {
   tags: string[];
@@ -15,31 +17,42 @@ export const TagInput = ({
   tags, 
   onTagsChange, 
   existingTags = [], 
-  placeholder = "Add tag..." 
+  placeholder = "Add custom tag..." 
 }: TagInputProps) => {
   const [inputValue, setInputValue] = useState("");
   const [suggestions, setSuggestions] = useState<string[]>([]);
 
+  // Normalize tag: lowercase and trim
+  const normalizeTag = (tag: string): string => {
+    return tag.trim().toLowerCase();
+  };
+
   const handleInputChange = (value: string) => {
     setInputValue(value);
     
-    // Show suggestions based on existing tags
+    // Show suggestions from preset tags and existing tags
     if (value.trim()) {
-      const filtered = existingTags.filter(
+      const allPossibleTags = [...PRESET_TAGS, ...existingTags];
+      const normalizedInput = normalizeTag(value);
+      const normalizedExistingTags = tags.map(normalizeTag);
+      
+      const filtered = allPossibleTags.filter(
         (tag) =>
-          tag.toLowerCase().includes(value.toLowerCase()) &&
-          !tags.includes(tag)
+          normalizeTag(tag).includes(normalizedInput) &&
+          !normalizedExistingTags.includes(normalizeTag(tag))
       );
-      setSuggestions(filtered.slice(0, 5));
+      setSuggestions([...new Set(filtered)].slice(0, 5));
     } else {
       setSuggestions([]);
     }
   };
 
   const addTag = (tag: string) => {
-    const trimmedTag = tag.trim();
-    if (trimmedTag && !tags.includes(trimmedTag)) {
-      onTagsChange([...tags, trimmedTag]);
+    const normalizedTag = normalizeTag(tag);
+    const normalizedExistingTags = tags.map(normalizeTag);
+    
+    if (normalizedTag && !normalizedExistingTags.includes(normalizedTag)) {
+      onTagsChange([...tags, normalizedTag]);
       setInputValue("");
       setSuggestions([]);
     }
@@ -50,7 +63,36 @@ export const TagInput = ({
   };
 
   return (
-    <div className="space-y-2">
+    <div className="space-y-3">
+      {/* Preset Tags */}
+      <div className="space-y-2">
+        <p className="text-xs text-muted-foreground">Quick tags:</p>
+        <div className="flex flex-wrap gap-2">
+          {PRESET_TAGS.map((presetTag) => {
+            const normalizedExistingTags = tags.map(normalizeTag);
+            const isSelected = normalizedExistingTags.includes(normalizeTag(presetTag));
+            
+            return (
+              <Badge
+                key={presetTag}
+                variant={isSelected ? "default" : "outline"}
+                className="cursor-pointer transition-all hover:scale-105"
+                onClick={() => {
+                  if (isSelected) {
+                    removeTag(tags.find(t => normalizeTag(t) === normalizeTag(presetTag)) || presetTag);
+                  } else {
+                    addTag(presetTag);
+                  }
+                }}
+              >
+                {presetTag}
+              </Badge>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Custom Tag Input */}
       <div className="flex gap-2">
         <div className="relative flex-1">
           <Input
@@ -89,6 +131,7 @@ export const TagInput = ({
         </Button>
       </div>
 
+      {/* Selected Tags */}
       {tags.length > 0 && (
         <div className="flex flex-wrap gap-2">
           {tags.map((tag) => (
