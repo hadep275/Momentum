@@ -42,9 +42,12 @@ export const ChecklistItem = ({ checklist, onUpdate }: ChecklistItemProps) => {
 
   const handleToggleComplete = () => {
     if (isTracking) {
-      handleToggleTracking();
+      // Stop tracking and save both time and completion status together
+      setIsTracking(false);
+      onUpdate({ completed: !checklist.completed, timeSpent: currentTime });
+    } else {
+      onUpdate({ completed: !checklist.completed });
     }
-    onUpdate({ completed: !checklist.completed });
   };
 
   const formatTime = (seconds: number) => {
