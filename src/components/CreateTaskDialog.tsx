@@ -87,16 +87,16 @@ export const CreateTaskDialog = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[90vh] flex flex-col p-0">
-        <DialogHeader className="px-6 pt-6">
+      <DialogContent className="max-w-[calc(100vw-2rem)] sm:max-w-2xl max-h-[90vh] flex flex-col p-0">
+        <DialogHeader className="px-4 sm:px-6 pt-6">
           <DialogTitle>Create New Task</DialogTitle>
           <DialogDescription>
             Add a new task with category, tags, checklists, and schedule
           </DialogDescription>
         </DialogHeader>
 
-        <ScrollArea className="flex-1 px-6">
-          <div className="space-y-4 pb-4">
+        <ScrollArea className="flex-1 px-4 sm:px-6 overflow-y-auto">
+          <div className="space-y-4 pb-4 pr-3">
           <div className="space-y-2">
             <Label htmlFor="title">Task Title *</Label>
             <Input
@@ -232,7 +232,7 @@ export const CreateTaskDialog = ({
           </div>
         </ScrollArea>
 
-        <div className="flex justify-end gap-2 px-6 pb-6 border-t pt-4">
+        <div className="flex justify-end gap-2 px-4 sm:px-6 pb-6 border-t pt-4">
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             Cancel
           </Button>
