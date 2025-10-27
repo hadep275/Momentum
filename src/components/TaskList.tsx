@@ -1,21 +1,35 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Plus } from "lucide-react";
+import { Plus, CheckSquare, ListTodo } from "lucide-react";
 import { TaskItem } from "@/components/TaskItem";
+import { HabitItem } from "@/components/HabitItem";
 import { CreateTaskDialog } from "@/components/CreateTaskDialog";
+import { CreateHabitDialog } from "@/components/CreateHabitDialog";
+import { EditHabitDialog } from "@/components/EditHabitDialog";
 import { CategoryFilter } from "@/components/CategoryFilter";
-import { Task } from "@/types/task";
-import { isSameDay } from "date-fns";
+import { Task, Habit } from "@/types/task";
+import { isSameDay, format } from "date-fns";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
 
 interface TaskListProps {
   tasks: Task[];
   onUpdateTasks: (tasks: Task[]) => void;
+  habits: Habit[];
+  onUpdateHabits: (habits: Habit[]) => void;
 }
 
-export const TaskList = ({ tasks, onUpdateTasks }: TaskListProps) => {
+export const TaskList = ({ tasks, onUpdateTasks, habits, onUpdateHabits }: TaskListProps) => {
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+  const [isCreateHabitDialogOpen, setIsCreateHabitDialogOpen] = useState(false);
+  const [isNewItemSheetOpen, setIsNewItemSheetOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [editingHabit, setEditingHabit] = useState<Habit | null>(null);
 
   // Get all unique tags from tasks for autocomplete
   const allTags = Array.from(new Set(tasks.flatMap((task) => task.tags)));
@@ -38,11 +52,69 @@ export const TaskList = ({ tasks, onUpdateTasks }: TaskListProps) => {
     onUpdateTasks(tasks.filter((t) => t.id !== taskId));
   };
 
+  const handleCreateHabit = (habit: Omit<Habit, "id" | "createdAt">) => {
+    const newHabit: Habit = {
+      ...habit,
+      id: crypto.randomUUID(),
+      createdAt: new Date(),
+    };
+    onUpdateHabits([...habits, newHabit]);
+    setIsCreateHabitDialogOpen(false);
+    setIsNewItemSheetOpen(false);
+  };
+
+  const handleUpdateHabit = (updatedHabit: Habit) => {
+    onUpdateHabits(habits.map((h) => (h.id === updatedHabit.id ? updatedHabit : h)));
+  };
+
+  const handleDeleteHabit = (habitId: string) => {
+    onUpdateHabits(habits.filter((h) => h.id !== habitId));
+  };
+
+  const handleToggleHabitComplete = (habitId: string) => {
+    const today = format(new Date(), "yyyy-MM-dd");
+    const habit = habits.find((h) => h.id === habitId);
+    if (!habit) return;
+
+    const isCompletedToday = habit.completions.some((c) => c.date === today);
+
+    const updatedHabit: Habit = {
+      ...habit,
+      completions: isCompletedToday
+        ? habit.completions.filter((c) => c.date !== today)
+        : [...habit.completions, { date: today }],
+    };
+
+    onUpdateHabits(habits.map((h) => (h.id === habitId ? updatedHabit : h)));
+  };
+
+  const openNewTaskDialog = () => {
+    setIsNewItemSheetOpen(false);
+    setIsCreateDialogOpen(true);
+  };
+
+  const openNewHabitDialog = () => {
+    setIsNewItemSheetOpen(false);
+    setIsCreateHabitDialogOpen(true);
+  };
+
   // Filter tasks: only show today's tasks
   const today = new Date();
   const todaysTasks = tasks.filter((task) => 
     task.dueDate && isSameDay(task.dueDate, today)
   );
+
+  // Filter habits: only show habits for today's day of week
+  const todayDayOfWeek = today.getDay();
+  const todaysHabits = habits.filter((habit) =>
+    habit.daysOfWeek.includes(todayDayOfWeek)
+  );
+
+  const todayFormatted = format(today, "yyyy-MM-dd");
+  const habitsWithCompletion = todaysHabits.map((habit) => ({
+    habit,
+    isCompletedToday: habit.completions.some((c) => c.date === todayFormatted),
+  }));
 
   // Filter by category
   const filteredTasks = selectedCategory
@@ -82,12 +154,15 @@ export const TaskList = ({ tasks, onUpdateTasks }: TaskListProps) => {
     <div className="space-y-4">
       <div className="flex justify-between items-center">
         <div>
-          <h2 className="text-2xl font-semibold">Today's Tasks</h2>
-          <p className="text-sm text-muted-foreground">Focus on what matters today</p>
+          <h2 className="text-2xl font-semibold">Today's Focus</h2>
+          <p className="text-sm text-muted-foreground">Tasks and habits for today</p>
         </div>
-        <Button onClick={() => setIsCreateDialogOpen(true)} className="gap-2 min-h-[44px]">
-          <Plus className="w-4 h-4" />
-          New Task
+        <Button 
+          onClick={() => setIsNewItemSheetOpen(true)} 
+          size="icon"
+          className="h-12 w-12 rounded-full min-h-[44px]"
+        >
+          <Plus className="w-5 h-5" />
         </Button>
       </div>
 
@@ -96,39 +171,111 @@ export const TaskList = ({ tasks, onUpdateTasks }: TaskListProps) => {
         onCategoryChange={setSelectedCategory}
       />
 
-      {filteredTasks.length === 0 ? (
-        <Card className="p-12 text-center border-2 border-gold bg-card">
-          <p className="text-muted-foreground mb-4">
-            {selectedCategory 
-              ? "No tasks in this category for today."
-              : todaysTasks.length === 0 
-                ? "No tasks scheduled for today. Plan your day!"
-                : "No tasks in this category for today."}
-          </p>
-          <Button onClick={() => setIsCreateDialogOpen(true)} className="gap-2 bg-gold text-accent-foreground hover:bg-gold/90 border-2 border-copper min-h-[44px]">
-            <Plus className="w-4 h-4" />
-            Create Task
-          </Button>
-        </Card>
-      ) : (
-        <div className="space-y-3">
-          {sortedTasks.map((task) => (
-            <TaskItem
-              key={task.id}
-              task={task}
-              onUpdate={handleUpdateTask}
-              onDelete={handleDeleteTask}
-              existingTags={allTags}
-            />
-          ))}
-        </div>
-      )}
+      <div>
+        <h3 className="text-lg font-semibold mb-3">Tasks</h3>
+        {filteredTasks.length === 0 ? (
+          <Card className="p-8 text-center border-2 border-dashed bg-card">
+            <p className="text-muted-foreground text-sm">
+              {selectedCategory 
+                ? "No tasks in this category for today."
+                : todaysTasks.length === 0 
+                  ? "No tasks scheduled for today."
+                  : "No tasks in this category for today."}
+            </p>
+          </Card>
+        ) : (
+          <div className="space-y-3">
+            {sortedTasks.map((task) => (
+              <TaskItem
+                key={task.id}
+                task={task}
+                onUpdate={handleUpdateTask}
+                onDelete={handleDeleteTask}
+                existingTags={allTags}
+              />
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Daily Habits Section */}
+      <div>
+        <h3 className="text-lg font-semibold mb-3">Daily Habits</h3>
+        {todaysHabits.length === 0 ? (
+          <Card className="p-8 text-center border-2 border-dashed bg-card">
+            <p className="text-muted-foreground text-sm">
+              No habits scheduled for today.
+            </p>
+          </Card>
+        ) : (
+          <div className="space-y-3">
+            {habitsWithCompletion.map(({ habit, isCompletedToday }) => (
+              <HabitItem
+                key={habit.id}
+                habit={habit}
+                isCompletedToday={isCompletedToday}
+                onToggleComplete={handleToggleHabitComplete}
+                onEdit={setEditingHabit}
+                onDelete={handleDeleteHabit}
+              />
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* New Item Sheet */}
+      <Sheet open={isNewItemSheetOpen} onOpenChange={setIsNewItemSheetOpen}>
+        <SheetContent side="bottom" className="h-auto">
+          <SheetHeader>
+            <SheetTitle>Create New</SheetTitle>
+          </SheetHeader>
+          <div className="grid grid-cols-2 gap-4 mt-6">
+            <Card 
+              className="p-6 cursor-pointer hover:border-gold transition-all hover:shadow-lg"
+              onClick={openNewTaskDialog}
+            >
+              <div className="flex flex-col items-center text-center gap-3">
+                <ListTodo className="w-8 h-8 text-gold" />
+                <div>
+                  <h4 className="font-semibold">Task</h4>
+                  <p className="text-xs text-muted-foreground">One-time or scheduled</p>
+                </div>
+              </div>
+            </Card>
+            <Card 
+              className="p-6 cursor-pointer hover:border-gold transition-all hover:shadow-lg"
+              onClick={openNewHabitDialog}
+            >
+              <div className="flex flex-col items-center text-center gap-3">
+                <CheckSquare className="w-8 h-8 text-gold" />
+                <div>
+                  <h4 className="font-semibold">Habit</h4>
+                  <p className="text-xs text-muted-foreground">Recurring routine</p>
+                </div>
+              </div>
+            </Card>
+          </div>
+        </SheetContent>
+      </Sheet>
 
       <CreateTaskDialog
         open={isCreateDialogOpen}
         onOpenChange={setIsCreateDialogOpen}
         onCreateTask={handleCreateTask}
         existingTags={allTags}
+      />
+
+      <CreateHabitDialog
+        open={isCreateHabitDialogOpen}
+        onOpenChange={setIsCreateHabitDialogOpen}
+        onCreateHabit={handleCreateHabit}
+      />
+
+      <EditHabitDialog
+        open={!!editingHabit}
+        onOpenChange={(open) => !open && setEditingHabit(null)}
+        habit={editingHabit}
+        onUpdateHabit={handleUpdateHabit}
       />
     </div>
   );

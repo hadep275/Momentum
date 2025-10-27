@@ -50,3 +50,11 @@ export interface Task {
   completed: boolean;
   createdAt: Date;
 }
+
+export interface Habit {
+  id: string;
+  title: string;
+  daysOfWeek: number[]; // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
+  completions: { date: string }[]; // ISO date strings when completed
+  createdAt: Date;
+}

@@ -4,9 +4,10 @@ import { TaskList } from "@/components/TaskList";
 import { TagManagement } from "@/components/TagManagement";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ListTodo, CalendarDays, BarChart3 } from "lucide-react";
-import { Task } from "@/types/task";
+import { Task, Habit } from "@/types/task";
 
 const TASKS_STORAGE_KEY = "momentum-tasks";
+const HABITS_STORAGE_KEY = "momentum-habits";
 
 const Index = () => {
   const [tasks, setTasks] = useState<Task[]>(() => {
@@ -30,10 +31,33 @@ const Index = () => {
     return [];
   });
 
+  const [habits, setHabits] = useState<Habit[]>(() => {
+    // Load habits from localStorage on initial render
+    const stored = localStorage.getItem(HABITS_STORAGE_KEY);
+    if (stored) {
+      try {
+        const parsed = JSON.parse(stored);
+        return parsed.map((habit: any) => ({
+          ...habit,
+          createdAt: new Date(habit.createdAt),
+        }));
+      } catch (e) {
+        console.error("Failed to parse stored habits:", e);
+        return [];
+      }
+    }
+    return [];
+  });
+
   // Save tasks to localStorage whenever they change
   useEffect(() => {
     localStorage.setItem(TASKS_STORAGE_KEY, JSON.stringify(tasks));
   }, [tasks]);
+
+  // Save habits to localStorage whenever they change
+  useEffect(() => {
+    localStorage.setItem(HABITS_STORAGE_KEY, JSON.stringify(habits));
+  }, [habits]);
 
   return (
     <div className="min-h-screen bg-background pb-20">
@@ -47,7 +71,12 @@ const Index = () => {
 
         <Tabs defaultValue="tasks" className="w-full">
           <TabsContent value="tasks" className="space-y-4">
-            <TaskList tasks={tasks} onUpdateTasks={setTasks} />
+            <TaskList 
+              tasks={tasks} 
+              onUpdateTasks={setTasks}
+              habits={habits}
+              onUpdateHabits={setHabits}
+            />
           </TabsContent>
 
           <TabsContent value="calendar" className="space-y-4">
