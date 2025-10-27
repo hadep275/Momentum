@@ -89,7 +89,7 @@ export const VoiceTextarea = ({ value, onChange, ...props }: VoiceTextareaProps)
         type="button"
         size="icon"
         variant={isListening ? "default" : "ghost"}
-        className="absolute right-2 top-2 h-8 w-8"
+        className="absolute right-2 bottom-2 h-8 w-8"
         onClick={isListening ? stopListening : startListening}
       >
         {isListening ? (
