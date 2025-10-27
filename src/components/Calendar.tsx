@@ -79,14 +79,21 @@ export const Calendar = ({ tasks, habits, onUpdateTasks }: CalendarProps) => {
   const selectedDateHabits = selectedDate ? getHabitsForDate(selectedDate) : [];
   const selectedDateFormatted = selectedDate ? format(selectedDate, "yyyy-MM-dd") : "";
 
-  // Sort tasks by time
+  // Sort tasks by time first, then priority (same logic as main view)
   const sortedSelectedTasks = [...selectedDateTasks].sort((a, b) => {
+    // First, compare times if available
     if (a.dueTime && b.dueTime) {
-      return a.dueTime.localeCompare(b.dueTime);
+      const timeCompare = a.dueTime.localeCompare(b.dueTime);
+      if (timeCompare !== 0) return timeCompare;
     }
+    
+    // If one has time and other doesn't, prioritize the one with time
     if (a.dueTime && !b.dueTime) return -1;
     if (!a.dueTime && b.dueTime) return 1;
-    return 0;
+    
+    // If neither has time OR times are equal, sort by priority
+    const priorityOrder = { high: 0, medium: 1, low: 2 };
+    return priorityOrder[a.priority] - priorityOrder[b.priority];
   });
 
   // Sort habits by time
