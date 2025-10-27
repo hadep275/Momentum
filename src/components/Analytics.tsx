@@ -285,7 +285,7 @@ export const Analytics = ({ tasks, habits }: AnalyticsProps) => {
       onClick={() => setDateRangePreset(preset)}
       className={cn(
         "transition-all",
-        dateRangePreset === preset && "bg-gold hover:bg-gold/90"
+        dateRangePreset === preset && "bg-gold hover:bg-gold/90 text-black hover:text-black"
       )}
     >
       {label}
@@ -318,7 +318,7 @@ export const Analytics = ({ tasks, habits }: AnalyticsProps) => {
                 size="sm"
                 className={cn(
                   "gap-2",
-                  dateRangePreset === "custom" && "bg-gold hover:bg-gold/90"
+                  dateRangePreset === "custom" && "bg-gold hover:bg-gold/90 text-black hover:text-black"
                 )}
               >
                 <CalendarIcon className="h-4 w-4" />
