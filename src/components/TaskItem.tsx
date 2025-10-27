@@ -40,7 +40,15 @@ export const TaskItem = ({ task, onUpdate, onDelete }: TaskItemProps) => {
     const updatedChecklists = task.checklists.map((c) =>
       c.id === checklistId ? { ...c, ...updates } : c
     );
-    onUpdate({ ...task, checklists: updatedChecklists });
+    
+    // Check if all checklists are now completed
+    const allCompleted = updatedChecklists.every((c) => c.completed);
+    
+    onUpdate({ 
+      ...task, 
+      checklists: updatedChecklists,
+      completed: allCompleted || task.completed // Auto-complete task if all checklists are done
+    });
   };
 
   const getRecurrenceText = () => {
