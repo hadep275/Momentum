@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Calendar } from "@/components/Calendar";
 import { TaskList } from "@/components/TaskList";
 import { TagManagement } from "@/components/TagManagement";
@@ -6,8 +6,33 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ListTodo, CalendarDays, BarChart3 } from "lucide-react";
 import { Task } from "@/types/task";
 
+const TASKS_STORAGE_KEY = "momentum-tasks";
+
 const Index = () => {
-  const [tasks, setTasks] = useState<Task[]>([]);
+  const [tasks, setTasks] = useState<Task[]>(() => {
+    // Load tasks from localStorage on initial render
+    const stored = localStorage.getItem(TASKS_STORAGE_KEY);
+    if (stored) {
+      try {
+        const parsed = JSON.parse(stored);
+        // Convert date strings back to Date objects
+        return parsed.map((task: any) => ({
+          ...task,
+          createdAt: new Date(task.createdAt),
+          dueDate: task.dueDate ? new Date(task.dueDate) : undefined,
+        }));
+      } catch (e) {
+        console.error("Failed to parse stored tasks:", e);
+        return [];
+      }
+    }
+    return [];
+  });
+
+  // Save tasks to localStorage whenever they change
+  useEffect(() => {
+    localStorage.setItem(TASKS_STORAGE_KEY, JSON.stringify(tasks));
+  }, [tasks]);
 
   return (
     <div className="min-h-screen bg-background pb-20">
