@@ -18,6 +18,7 @@ const Index = () => {
         // Convert date strings back to Date objects
         return parsed.map((task: any) => ({
           ...task,
+          priority: task.priority || "medium", // Default to medium if missing
           createdAt: new Date(task.createdAt),
           dueDate: task.dueDate ? new Date(task.dueDate) : undefined,
         }));

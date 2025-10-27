@@ -24,11 +24,15 @@ export const PRESET_TAGS = [
   "routine",
 ] as const;
 
+export type TaskPriority = "high" | "medium" | "low";
+
 export interface Task {
   id: string;
   title: string;
   description?: string;
   dueDate?: Date;
+  dueTime?: string; // HH:mm format
+  priority: TaskPriority;
   categoryId?: string;
   tags: string[];
   recurrence?: {

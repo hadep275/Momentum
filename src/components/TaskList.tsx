@@ -42,6 +42,35 @@ export const TaskList = ({ tasks, onUpdateTasks }: TaskListProps) => {
     ? tasks.filter((task) => task.categoryId === selectedCategory)
     : tasks;
 
+  // Smart sorting: time first, then priority
+  const sortedTasks = [...filteredTasks].sort((a, b) => {
+    // First, sort by date and time if both tasks have dates
+    if (a.dueDate && b.dueDate) {
+      const dateCompare = a.dueDate.getTime() - b.dueDate.getTime();
+      
+      // If dates are the same, compare times if available
+      if (dateCompare === 0) {
+        if (a.dueTime && b.dueTime) {
+          return a.dueTime.localeCompare(b.dueTime);
+        }
+        // If one has time and other doesn't, prioritize the one with time
+        if (a.dueTime && !b.dueTime) return -1;
+        if (!a.dueTime && b.dueTime) return 1;
+      }
+      
+      // If dates are different, return date comparison
+      if (dateCompare !== 0) return dateCompare;
+    }
+    
+    // If only one has a date, it comes first
+    if (a.dueDate && !b.dueDate) return -1;
+    if (!a.dueDate && b.dueDate) return 1;
+    
+    // If neither has a date OR dates/times are equal, sort by priority
+    const priorityOrder = { high: 0, medium: 1, low: 2 };
+    return priorityOrder[a.priority] - priorityOrder[b.priority];
+  });
+
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
@@ -71,7 +100,7 @@ export const TaskList = ({ tasks, onUpdateTasks }: TaskListProps) => {
         </Card>
       ) : (
         <div className="space-y-3">
-          {filteredTasks.map((task) => (
+          {sortedTasks.map((task) => (
             <TaskItem
               key={task.id}
               task={task}

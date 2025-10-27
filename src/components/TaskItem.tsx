@@ -4,12 +4,12 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
-import { ChevronDown, ChevronUp, Trash2, Clock, Calendar } from "lucide-react";
+import { ChevronDown, ChevronUp, Trash2, Clock, Calendar, AlertCircle } from "lucide-react";
 import { Task } from "@/types/task";
 import { ChecklistItem } from "@/components/ChecklistItem";
 import { CategoryBadge } from "@/components/CategoryBadge";
 import { TagBadge } from "@/components/TagBadge";
-import { formatDistanceToNow, isPast, differenceInDays } from "date-fns";
+import { formatDistanceToNow, isPast, differenceInDays, format } from "date-fns";
 
 interface TaskItemProps {
   task: Task;
@@ -77,40 +77,54 @@ export const TaskItem = ({ task, onUpdate, onDelete }: TaskItemProps) => {
     const now = new Date();
     const daysUntilDue = differenceInDays(task.dueDate, now);
     
+    const timeText = task.dueTime ? ` at ${task.dueTime}` : '';
+    
     if (isPast(task.dueDate) && !task.completed) {
       return {
-        text: `Overdue by ${formatDistanceToNow(task.dueDate)}`,
+        text: `Overdue by ${formatDistanceToNow(task.dueDate)}${timeText}`,
         variant: "destructive" as const,
         color: "text-destructive"
       };
     } else if (daysUntilDue === 0) {
       return {
-        text: "Due today",
+        text: `Due today${timeText}`,
         variant: "default" as const,
         color: "text-gold"
       };
     } else if (daysUntilDue === 1) {
       return {
-        text: "Due tomorrow",
+        text: `Due tomorrow${timeText}`,
         variant: "secondary" as const,
         color: "text-gold"
       };
     } else if (daysUntilDue <= 3) {
       return {
-        text: `Due in ${daysUntilDue} days`,
+        text: `Due in ${daysUntilDue} days${timeText}`,
         variant: "secondary" as const,
         color: "text-accent"
       };
     } else {
       return {
-        text: `Due in ${formatDistanceToNow(task.dueDate)}`,
+        text: `Due in ${formatDistanceToNow(task.dueDate)}${timeText}`,
         variant: "outline" as const,
         color: "text-muted-foreground"
       };
     }
   };
 
+  const getPriorityConfig = () => {
+    switch (task.priority) {
+      case "high":
+        return { text: "High Priority", variant: "destructive" as const, icon: AlertCircle };
+      case "medium":
+        return { text: "Medium Priority", variant: "default" as const, icon: AlertCircle };
+      case "low":
+        return { text: "Low Priority", variant: "secondary" as const, icon: AlertCircle };
+    }
+  };
+
   const dueDateStatus = getDueDateStatus();
+  const priorityConfig = getPriorityConfig();
 
   return (
     <Card className="p-4 hover:shadow-xl transition-all border-2 border-gold bg-card shadow-lg shadow-primary/20">
@@ -144,6 +158,10 @@ export const TaskItem = ({ task, onUpdate, onDelete }: TaskItemProps) => {
               </div>
               
               <div className="flex items-center gap-2 flex-wrap">
+                <Badge variant={priorityConfig.variant} className="text-xs gap-1">
+                  <priorityConfig.icon className="w-3 h-3" />
+                  {priorityConfig.text}
+                </Badge>
                 {dueDateStatus && (
                   <Badge variant={dueDateStatus.variant} className="text-xs gap-1">
                     <Calendar className="w-3 h-3" />

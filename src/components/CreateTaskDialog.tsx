@@ -13,8 +13,8 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Plus, X, CalendarIcon } from "lucide-react";
-import { Task, TASK_CATEGORIES } from "@/types/task";
+import { Plus, X, CalendarIcon, Clock } from "lucide-react";
+import { Task, TASK_CATEGORIES, TaskPriority } from "@/types/task";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { TagInput } from "@/components/TagInput";
@@ -36,6 +36,8 @@ export const CreateTaskDialog = ({
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [dueDate, setDueDate] = useState<Date | undefined>();
+  const [dueTime, setDueTime] = useState<string>("");
+  const [priority, setPriority] = useState<TaskPriority>("medium");
   const [categoryId, setCategoryId] = useState<string | undefined>();
   const [tags, setTags] = useState<string[]>([]);
   const [recurrenceType, setRecurrenceType] = useState<Task["recurrence"]>({ type: "daily" });
@@ -60,6 +62,8 @@ export const CreateTaskDialog = ({
       title: title.trim(),
       description: description.trim() || undefined,
       dueDate,
+      dueTime: dueTime || undefined,
+      priority,
       categoryId,
       tags,
       recurrence: recurrenceType,
@@ -78,6 +82,8 @@ export const CreateTaskDialog = ({
     setTitle("");
     setDescription("");
     setDueDate(undefined);
+    setDueTime("");
+    setPriority("medium");
     setCategoryId(undefined);
     setTags([]);
     setRecurrenceType({ type: "daily" });
@@ -141,6 +147,34 @@ export const CreateTaskDialog = ({
                 />
               </PopoverContent>
             </Popover>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="dueTime">Due Time (Optional)</Label>
+            <div className="relative">
+              <Clock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                id="dueTime"
+                type="time"
+                value={dueTime}
+                onChange={(e) => setDueTime(e.target.value)}
+                className="pl-10"
+              />
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="priority">Priority</Label>
+            <Select value={priority} onValueChange={(value) => setPriority(value as TaskPriority)}>
+              <SelectTrigger id="priority">
+                <SelectValue placeholder="Select priority" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="high">High</SelectItem>
+                <SelectItem value="medium">Medium</SelectItem>
+                <SelectItem value="low">Low</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
 
           <div className="space-y-2">
