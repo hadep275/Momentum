@@ -4,9 +4,10 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
-import { ChevronDown, ChevronUp, Trash2, Clock } from "lucide-react";
+import { ChevronDown, ChevronUp, Trash2, Clock, Calendar } from "lucide-react";
 import { Task } from "@/components/TaskList";
 import { ChecklistItem } from "@/components/ChecklistItem";
+import { formatDistanceToNow, isPast, differenceInDays } from "date-fns";
 
 interface TaskItemProps {
   task: Task;
@@ -68,6 +69,47 @@ export const TaskItem = ({ task, onUpdate, onDelete }: TaskItemProps) => {
     }
   };
 
+  const getDueDateStatus = () => {
+    if (!task.dueDate) return null;
+    
+    const now = new Date();
+    const daysUntilDue = differenceInDays(task.dueDate, now);
+    
+    if (isPast(task.dueDate) && !task.completed) {
+      return {
+        text: `Overdue by ${formatDistanceToNow(task.dueDate)}`,
+        variant: "destructive" as const,
+        color: "text-destructive"
+      };
+    } else if (daysUntilDue === 0) {
+      return {
+        text: "Due today",
+        variant: "default" as const,
+        color: "text-gold"
+      };
+    } else if (daysUntilDue === 1) {
+      return {
+        text: "Due tomorrow",
+        variant: "secondary" as const,
+        color: "text-gold"
+      };
+    } else if (daysUntilDue <= 3) {
+      return {
+        text: `Due in ${daysUntilDue} days`,
+        variant: "secondary" as const,
+        color: "text-accent"
+      };
+    } else {
+      return {
+        text: `Due in ${formatDistanceToNow(task.dueDate)}`,
+        variant: "outline" as const,
+        color: "text-muted-foreground"
+      };
+    }
+  };
+
+  const dueDateStatus = getDueDateStatus();
+
   return (
     <Card className="p-4 hover:shadow-xl transition-all border-2 border-gold bg-card shadow-lg shadow-primary/20">
       <div className="space-y-3">
@@ -89,7 +131,13 @@ export const TaskItem = ({ task, onUpdate, onDelete }: TaskItemProps) => {
                 )}
               </div>
               
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 flex-wrap">
+                {dueDateStatus && (
+                  <Badge variant={dueDateStatus.variant} className="text-xs gap-1">
+                    <Calendar className="w-3 h-3" />
+                    {dueDateStatus.text}
+                  </Badge>
+                )}
                 {getRecurrenceText() && (
                   <Badge variant="secondary" className="text-xs">
                     {getRecurrenceText()}

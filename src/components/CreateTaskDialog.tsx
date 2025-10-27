@@ -11,8 +11,12 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Plus, X } from "lucide-react";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Plus, X, CalendarIcon } from "lucide-react";
 import { Task } from "@/components/TaskList";
+import { format } from "date-fns";
+import { cn } from "@/lib/utils";
 
 interface CreateTaskDialogProps {
   open: boolean;
@@ -23,6 +27,7 @@ interface CreateTaskDialogProps {
 export const CreateTaskDialog = ({ open, onOpenChange, onCreateTask }: CreateTaskDialogProps) => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
+  const [dueDate, setDueDate] = useState<Date | undefined>();
   const [recurrenceType, setRecurrenceType] = useState<Task["recurrence"]>({ type: "daily" });
   const [checklists, setChecklists] = useState<string[]>([]);
   const [newChecklistItem, setNewChecklistItem] = useState("");
@@ -44,6 +49,7 @@ export const CreateTaskDialog = ({ open, onOpenChange, onCreateTask }: CreateTas
     const task: Omit<Task, "id" | "createdAt"> = {
       title: title.trim(),
       description: description.trim() || undefined,
+      dueDate,
       recurrence: recurrenceType,
       checklists: checklists.map((item, index) => ({
         id: `checklist-${index}-${Date.now()}`,
@@ -59,6 +65,7 @@ export const CreateTaskDialog = ({ open, onOpenChange, onCreateTask }: CreateTas
     // Reset form
     setTitle("");
     setDescription("");
+    setDueDate(undefined);
     setRecurrenceType({ type: "daily" });
     setChecklists([]);
     setNewChecklistItem("");
@@ -93,6 +100,32 @@ export const CreateTaskDialog = ({ open, onOpenChange, onCreateTask }: CreateTas
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Add task description (optional)"
             />
+          </div>
+
+          <div className="space-y-2">
+            <Label>Due Date</Label>
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  className={cn(
+                    "w-full justify-start text-left font-normal",
+                    !dueDate && "text-muted-foreground"
+                  )}
+                >
+                  <CalendarIcon className="mr-2 h-4 w-4" />
+                  {dueDate ? format(dueDate, "PPP") : "Pick a date"}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <Calendar
+                  mode="single"
+                  selected={dueDate}
+                  onSelect={setDueDate}
+                  initialFocus
+                />
+              </PopoverContent>
+            </Popover>
           </div>
 
           <div className="space-y-2">

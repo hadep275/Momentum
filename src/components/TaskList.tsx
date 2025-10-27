@@ -9,6 +9,7 @@ export interface Task {
   id: string;
   title: string;
   description?: string;
+  dueDate?: Date;
   recurrence?: {
     type: "daily" | "weekly" | "monthly" | "custom";
     interval?: number;
