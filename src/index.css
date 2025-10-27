@@ -24,7 +24,7 @@ All colors MUST be HSL.
     --secondary-foreground: 45 90% 92%;
 
     --muted: 340 45% 38%;
-    --muted-foreground: 45 40% 75%;
+    --muted-foreground: 45 60% 85%;
 
     --accent: 45 88% 62%;
     --accent-foreground: 328 48% 20%;
@@ -71,7 +71,7 @@ All colors MUST be HSL.
     --secondary-foreground: 45 90% 92%;
 
     --muted: 340 45% 38%;
-    --muted-foreground: 45 40% 75%;
+    --muted-foreground: 45 60% 85%;
 
     --accent: 45 88% 62%;
     --accent-foreground: 328 48% 20%;
@@ -107,5 +107,19 @@ All colors MUST be HSL.
 
   body {
     @apply bg-background text-foreground;
+  }
+
+  /* Enhanced focus indicators for accessibility */
+  *:focus-visible {
+    @apply outline-none ring-4 ring-ring ring-offset-2 ring-offset-background;
+  }
+
+  /* Ensure interactive elements have visible focus states */
+  button:focus-visible,
+  a:focus-visible,
+  input:focus-visible,
+  textarea:focus-visible,
+  select:focus-visible {
+    @apply ring-4 ring-ring ring-offset-2 ring-offset-background;
   }
 }
