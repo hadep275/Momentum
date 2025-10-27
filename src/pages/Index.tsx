@@ -8,9 +8,9 @@ const Index = () => {
       <div className="container mx-auto py-8 px-4">
         <header className="mb-8 border-b-2 border-gold pb-6">
           <h1 className="text-5xl font-bold text-gold drop-shadow-lg">
-            Ultimate Productivity
+            Momentum
           </h1>
-          <p className="text-foreground mt-2 text-lg">Track tasks, time, and achieve your goals</p>
+          <p className="text-foreground mt-2 text-lg">Build your best self, one task at a time</p>
         </header>
 
         <Tabs defaultValue="tasks" className="w-full">

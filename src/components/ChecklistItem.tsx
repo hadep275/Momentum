@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import { Play, Pause, Clock } from "lucide-react";
-import { Task } from "@/components/TaskList";
+import { Task } from "@/types/task";
 
 interface ChecklistItemProps {
   checklist: Task["checklists"][0];

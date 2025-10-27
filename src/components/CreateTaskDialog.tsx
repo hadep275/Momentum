@@ -14,20 +14,30 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Plus, X, CalendarIcon } from "lucide-react";
-import { Task } from "@/components/TaskList";
+import { Task, TASK_CATEGORIES } from "@/types/task";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
+import { TagInput } from "@/components/TagInput";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface CreateTaskDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onCreateTask: (task: Omit<Task, "id" | "createdAt">) => void;
+  existingTags?: string[];
 }
 
-export const CreateTaskDialog = ({ open, onOpenChange, onCreateTask }: CreateTaskDialogProps) => {
+export const CreateTaskDialog = ({ 
+  open, 
+  onOpenChange, 
+  onCreateTask,
+  existingTags = []
+}: CreateTaskDialogProps) => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [dueDate, setDueDate] = useState<Date | undefined>();
+  const [categoryId, setCategoryId] = useState<string | undefined>();
+  const [tags, setTags] = useState<string[]>([]);
   const [recurrenceType, setRecurrenceType] = useState<Task["recurrence"]>({ type: "daily" });
   const [checklists, setChecklists] = useState<string[]>([]);
   const [newChecklistItem, setNewChecklistItem] = useState("");
@@ -50,6 +60,8 @@ export const CreateTaskDialog = ({ open, onOpenChange, onCreateTask }: CreateTas
       title: title.trim(),
       description: description.trim() || undefined,
       dueDate,
+      categoryId,
+      tags,
       recurrence: recurrenceType,
       checklists: checklists.map((item, index) => ({
         id: `checklist-${index}-${Date.now()}`,
@@ -66,6 +78,8 @@ export const CreateTaskDialog = ({ open, onOpenChange, onCreateTask }: CreateTas
     setTitle("");
     setDescription("");
     setDueDate(undefined);
+    setCategoryId(undefined);
+    setTags([]);
     setRecurrenceType({ type: "daily" });
     setChecklists([]);
     setNewChecklistItem("");
@@ -73,15 +87,16 @@ export const CreateTaskDialog = ({ open, onOpenChange, onCreateTask }: CreateTas
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
-        <DialogHeader>
+      <DialogContent className="max-w-2xl max-h-[90vh] flex flex-col p-0">
+        <DialogHeader className="px-6 pt-6">
           <DialogTitle>Create New Task</DialogTitle>
           <DialogDescription>
-            Add a new task with optional checklists and recurring schedule
+            Add a new task with category, tags, checklists, and schedule
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-4 py-4">
+        <ScrollArea className="flex-1 px-6">
+          <div className="space-y-4 pb-4">
           <div className="space-y-2">
             <Label htmlFor="title">Task Title *</Label>
             <Input
@@ -126,6 +141,32 @@ export const CreateTaskDialog = ({ open, onOpenChange, onCreateTask }: CreateTas
                 />
               </PopoverContent>
             </Popover>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="category">Category</Label>
+            <Select value={categoryId} onValueChange={setCategoryId}>
+              <SelectTrigger id="category">
+                <SelectValue placeholder="Select a category (optional)" />
+              </SelectTrigger>
+              <SelectContent>
+                {TASK_CATEGORIES.map((category) => (
+                  <SelectItem key={category.id} value={category.id}>
+                    {category.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-2">
+            <Label>Tags</Label>
+            <TagInput
+              tags={tags}
+              onTagsChange={setTags}
+              existingTags={existingTags}
+              placeholder="Add tags..."
+            />
           </div>
 
           <div className="space-y-2">
@@ -188,9 +229,10 @@ export const CreateTaskDialog = ({ open, onOpenChange, onCreateTask }: CreateTas
               </div>
             )}
           </div>
-        </div>
+          </div>
+        </ScrollArea>
 
-        <div className="flex justify-end gap-2">
+        <div className="flex justify-end gap-2 px-6 pb-6 border-t pt-4">
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             Cancel
           </Button>

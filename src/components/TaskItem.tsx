@@ -5,8 +5,10 @@ import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { ChevronDown, ChevronUp, Trash2, Clock, Calendar } from "lucide-react";
-import { Task } from "@/components/TaskList";
+import { Task } from "@/types/task";
 import { ChecklistItem } from "@/components/ChecklistItem";
+import { CategoryBadge } from "@/components/CategoryBadge";
+import { TagBadge } from "@/components/TagBadge";
 import { formatDistanceToNow, isPast, differenceInDays } from "date-fns";
 
 interface TaskItemProps {
@@ -122,13 +124,23 @@ export const TaskItem = ({ task, onUpdate, onDelete }: TaskItemProps) => {
           
           <div className="flex-1 space-y-2">
             <div className="flex items-start justify-between gap-2">
-              <div>
+              <div className="flex-1 space-y-2">
                 <h3 className={`font-semibold ${task.completed ? "line-through text-muted-foreground" : ""}`}>
                   {task.title}
                 </h3>
                 {task.description && (
                   <p className="text-sm text-muted-foreground mt-1">{task.description}</p>
                 )}
+                
+                {/* Category and Tags */}
+                <div className="flex flex-wrap gap-2 items-center">
+                  {task.categoryId && (
+                    <CategoryBadge categoryId={task.categoryId} />
+                  )}
+                  {task.tags.map((tag) => (
+                    <TagBadge key={tag} tag={tag} variant="outline" />
+                  ))}
+                </div>
               </div>
               
               <div className="flex items-center gap-2 flex-wrap">
