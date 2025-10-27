@@ -44,6 +44,7 @@ export const CreateTaskDialog = ({
   const [recurrenceType, setRecurrenceType] = useState<Task["recurrence"]>({ type: "daily" });
   const [checklists, setChecklists] = useState<string[]>([]);
   const [newChecklistItem, setNewChecklistItem] = useState("");
+  const [reminderMinutes, setReminderMinutes] = useState<number | undefined>(undefined);
 
   const handleAddChecklistItem = () => {
     if (newChecklistItem.trim()) {
@@ -75,6 +76,7 @@ export const CreateTaskDialog = ({
         timeSpent: 0,
       })),
       completed: false,
+      reminderMinutes,
     };
 
     onCreateTask(task);
@@ -90,6 +92,7 @@ export const CreateTaskDialog = ({
     setRecurrenceType({ type: "daily" });
     setChecklists([]);
     setNewChecklistItem("");
+    setReminderMinutes(undefined);
   };
 
   return (
@@ -154,6 +157,26 @@ export const CreateTaskDialog = ({
             onChange={setDueTime}
             label="Due Time (Optional)"
           />
+
+          <div className="space-y-2">
+            <Label htmlFor="reminder">Reminder</Label>
+            <Select 
+              value={reminderMinutes?.toString() || "none"} 
+              onValueChange={(value) => setReminderMinutes(value === "none" ? undefined : parseInt(value))}
+            >
+              <SelectTrigger id="reminder">
+                <SelectValue placeholder="No reminder" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="none">No reminder</SelectItem>
+                <SelectItem value="15">15 minutes before</SelectItem>
+                <SelectItem value="30">30 minutes before</SelectItem>
+                <SelectItem value="60">1 hour before</SelectItem>
+                <SelectItem value="120">2 hours before</SelectItem>
+                <SelectItem value="1440">1 day before</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
 
           <div className="space-y-2">
             <Label htmlFor="priority">Priority</Label>

@@ -44,6 +44,7 @@ export const CreateHabitDialog = ({
   const [selectedDays, setSelectedDays] = useState<string[]>([]);
   const [time, setTime] = useState<string | undefined>(undefined);
   const [categoryId, setCategoryId] = useState<string | undefined>(undefined);
+  const [reminderMinutes, setReminderMinutes] = useState<number | undefined>(undefined);
 
   const handleSubmit = () => {
     if (!title.trim() || selectedDays.length === 0) return;
@@ -54,6 +55,7 @@ export const CreateHabitDialog = ({
       time,
       categoryId,
       completions: [],
+      reminderMinutes,
     };
 
     onCreateHabit(habit);
@@ -63,6 +65,7 @@ export const CreateHabitDialog = ({
     setSelectedDays([]);
     setTime(undefined);
     setCategoryId(undefined);
+    setReminderMinutes(undefined);
   };
 
   return (
@@ -111,6 +114,27 @@ export const CreateHabitDialog = ({
           <div className="space-y-2">
             <Label>Time (Optional)</Label>
             <TimePicker value={time} onChange={setTime} />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="reminder">Reminder</Label>
+            <Select 
+              value={reminderMinutes?.toString() || "none"} 
+              onValueChange={(value) => setReminderMinutes(value === "none" ? undefined : parseInt(value))}
+            >
+              <SelectTrigger id="reminder">
+                <SelectValue placeholder="No reminder" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="none">No reminder</SelectItem>
+                <SelectItem value="15">15 minutes before</SelectItem>
+                <SelectItem value="30">30 minutes before</SelectItem>
+                <SelectItem value="60">1 hour before</SelectItem>
+              </SelectContent>
+            </Select>
+            <p className="text-xs text-muted-foreground">
+              Get notified before your scheduled habit time
+            </p>
           </div>
 
           <div className="space-y-2">

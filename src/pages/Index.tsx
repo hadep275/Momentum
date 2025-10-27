@@ -8,6 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { ListTodo, CalendarDays, BarChart3, Settings } from "lucide-react";
 import { Task, Habit } from "@/types/task";
+import { useNotificationScheduler } from "@/hooks/useNotificationScheduler";
 
 const TASKS_STORAGE_KEY = "momentum-tasks";
 const HABITS_STORAGE_KEY = "momentum-habits";
@@ -84,6 +85,9 @@ const Index = () => {
       JSON.stringify({ hideCompletedHabits })
     );
   }, [hideCompletedHabits]);
+
+  // Initialize notification scheduler
+  useNotificationScheduler(tasks, habits);
 
   return (
     <div className="min-h-screen bg-background pb-20">

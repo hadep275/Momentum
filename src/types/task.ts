@@ -49,6 +49,7 @@ export interface Task {
   }[];
   completed: boolean;
   createdAt: Date;
+  reminderMinutes?: number; // Minutes before due time to remind
 }
 
 export interface Habit {
@@ -59,4 +60,5 @@ export interface Habit {
   categoryId?: string;
   completions: { date: string }[]; // ISO date strings when completed
   createdAt: Date;
+  reminderMinutes?: number; // Minutes before scheduled time to remind
 }
