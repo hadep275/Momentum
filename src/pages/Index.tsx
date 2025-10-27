@@ -4,7 +4,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const Index = () => {
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background pb-20">
       <div className="container mx-auto py-8 px-4">
         <header className="mb-8 border-b-2 border-gold pb-6">
           <h1 className="text-5xl font-bold text-gold drop-shadow-lg">
@@ -14,12 +14,6 @@ const Index = () => {
         </header>
 
         <Tabs defaultValue="tasks" className="w-full">
-          <TabsList className="grid w-full grid-cols-3 mb-6">
-            <TabsTrigger value="tasks">Tasks</TabsTrigger>
-            <TabsTrigger value="calendar">Calendar</TabsTrigger>
-            <TabsTrigger value="analytics">Analytics</TabsTrigger>
-          </TabsList>
-
           <TabsContent value="tasks" className="space-y-4">
             <TaskList />
           </TabsContent>
@@ -33,6 +27,13 @@ const Index = () => {
               Analytics coming soon...
             </div>
           </TabsContent>
+
+          {/* Fixed Bottom Navigation */}
+          <TabsList className="fixed bottom-0 left-0 right-0 grid grid-cols-3 h-16 rounded-none border-t bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
+            <TabsTrigger value="tasks" className="h-full">Tasks</TabsTrigger>
+            <TabsTrigger value="calendar" className="h-full">Calendar</TabsTrigger>
+            <TabsTrigger value="analytics" className="h-full">Analytics</TabsTrigger>
+          </TabsList>
         </Tabs>
       </div>
     </div>
