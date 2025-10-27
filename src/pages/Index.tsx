@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Calendar } from "@/components/Calendar";
 import { TaskList } from "@/components/TaskList";
-import { TagManagement } from "@/components/TagManagement";
+import { Analytics } from "@/components/Analytics";
 import { AppSettings } from "@/components/AppSettings";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
@@ -127,7 +127,7 @@ const Index = () => {
           </TabsContent>
 
           <TabsContent value="analytics" className="space-y-4">
-            <TagManagement tasks={tasks} onUpdateTasks={setTasks} />
+            <Analytics tasks={tasks} habits={habits} />
           </TabsContent>
 
           {/* Fixed Bottom Navigation */}
