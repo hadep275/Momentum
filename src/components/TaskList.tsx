@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Plus, CheckSquare, ListTodo } from "lucide-react";
+import { SearchBar } from "@/components/SearchBar";
 import { TaskItem } from "@/components/TaskItem";
 import { HabitItem } from "@/components/HabitItem";
 import { CreateTaskDialog } from "@/components/CreateTaskDialog";
@@ -31,6 +32,7 @@ export const TaskList = ({ tasks, onUpdateTasks, habits, onUpdateHabits, hideCom
   const [isNewItemSheetOpen, setIsNewItemSheetOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [editingHabit, setEditingHabit] = useState<Habit | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
 
   // Get all unique tags from tasks for autocomplete
   const allTags = Array.from(new Set(tasks.flatMap((task) => task.tags)));
@@ -144,12 +146,32 @@ export const TaskList = ({ tasks, onUpdateTasks, habits, onUpdateHabits, hideCom
   });
 
   // Filter by category
-  const filteredTasks = selectedCategory
+  const categoryFilteredTasks = selectedCategory
     ? todaysTasks.filter((task) => task.categoryId === selectedCategory)
     : todaysTasks;
 
+  // Filter by search query
+  const searchFilteredTasks = searchQuery.trim()
+    ? categoryFilteredTasks.filter((task) => {
+        const query = searchQuery.toLowerCase();
+        return (
+          task.title.toLowerCase().includes(query) ||
+          task.description?.toLowerCase().includes(query) ||
+          task.tags.some((tag) => tag.toLowerCase().includes(query))
+        );
+      })
+    : categoryFilteredTasks;
+
+  // Filter habits by search query
+  const searchFilteredHabits = searchQuery.trim()
+    ? sortedHabits.filter(({ habit }) => {
+        const query = searchQuery.toLowerCase();
+        return habit.title.toLowerCase().includes(query);
+      })
+    : sortedHabits;
+
   // Smart sorting: time first, then priority
-  const sortedTasks = [...filteredTasks].sort((a, b) => {
+  const sortedTasks = [...searchFilteredTasks].sort((a, b) => {
     // First, sort by date and time if both tasks have dates
     if (a.dueDate && b.dueDate) {
       const dateCompare = a.dueDate.getTime() - b.dueDate.getTime();
@@ -193,6 +215,8 @@ export const TaskList = ({ tasks, onUpdateTasks, habits, onUpdateHabits, hideCom
         </Button>
       </div>
 
+      <SearchBar value={searchQuery} onChange={setSearchQuery} />
+
       <CategoryFilter
         selectedCategory={selectedCategory}
         onCategoryChange={setSelectedCategory}
@@ -200,10 +224,12 @@ export const TaskList = ({ tasks, onUpdateTasks, habits, onUpdateHabits, hideCom
 
       <div>
         <h3 className="text-lg font-semibold mb-3">Tasks</h3>
-        {filteredTasks.length === 0 ? (
+        {searchFilteredTasks.length === 0 ? (
           <Card className="p-8 text-center border-2 border-dashed bg-card">
             <p className="text-muted-foreground text-sm">
-              {selectedCategory 
+              {searchQuery.trim()
+                ? "No tasks found matching your search."
+                : selectedCategory 
                 ? "No tasks in this category for today."
                 : todaysTasks.length === 0 
                   ? "No tasks scheduled for today."
@@ -228,10 +254,12 @@ export const TaskList = ({ tasks, onUpdateTasks, habits, onUpdateHabits, hideCom
       {/* Daily Habits Section */}
       <div>
         <h3 className="text-lg font-semibold mb-3">Daily Habits</h3>
-        {visibleHabits.length === 0 ? (
+        {searchFilteredHabits.length === 0 ? (
           <Card className="p-8 text-center border-2 border-dashed bg-card">
             <p className="text-muted-foreground text-sm">
-              {selectedCategory 
+              {searchQuery.trim()
+                ? "No habits found matching your search."
+                : selectedCategory 
                 ? "No habits in this category for today."
                 : todaysHabits.length === 0 
                   ? "No habits scheduled for today."
@@ -240,7 +268,7 @@ export const TaskList = ({ tasks, onUpdateTasks, habits, onUpdateHabits, hideCom
           </Card>
         ) : (
           <div className="space-y-3">
-            {sortedHabits.map(({ habit, isCompletedToday }) => (
+            {searchFilteredHabits.map(({ habit, isCompletedToday }) => (
               <HabitItem
                 key={habit.id}
                 habit={habit}
