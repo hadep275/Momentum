@@ -8,8 +8,16 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Habit } from "@/types/task";
+import { Habit, TASK_CATEGORIES } from "@/types/task";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { TimePicker } from "@/components/TimePicker";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface CreateHabitDialogProps {
   open: boolean;
@@ -18,13 +26,13 @@ interface CreateHabitDialogProps {
 }
 
 const DAYS = [
-  { value: "0", label: "Sun" },
-  { value: "1", label: "Mon" },
-  { value: "2", label: "Tue" },
-  { value: "3", label: "Wed" },
-  { value: "4", label: "Thu" },
-  { value: "5", label: "Fri" },
-  { value: "6", label: "Sat" },
+  { value: "0", label: "Sun", short: "S" },
+  { value: "1", label: "Mon", short: "M" },
+  { value: "2", label: "Tue", short: "T" },
+  { value: "3", label: "Wed", short: "W" },
+  { value: "4", label: "Thu", short: "T" },
+  { value: "5", label: "Fri", short: "F" },
+  { value: "6", label: "Sat", short: "S" },
 ];
 
 export const CreateHabitDialog = ({
@@ -34,6 +42,8 @@ export const CreateHabitDialog = ({
 }: CreateHabitDialogProps) => {
   const [title, setTitle] = useState("");
   const [selectedDays, setSelectedDays] = useState<string[]>([]);
+  const [time, setTime] = useState<string | undefined>(undefined);
+  const [categoryId, setCategoryId] = useState<string | undefined>(undefined);
 
   const handleSubmit = () => {
     if (!title.trim() || selectedDays.length === 0) return;
@@ -41,6 +51,8 @@ export const CreateHabitDialog = ({
     const habit: Omit<Habit, "id" | "createdAt"> = {
       title: title.trim(),
       daysOfWeek: selectedDays.map(d => parseInt(d)),
+      time,
+      categoryId,
       completions: [],
     };
 
@@ -49,6 +61,8 @@ export const CreateHabitDialog = ({
     // Reset form
     setTitle("");
     setSelectedDays([]);
+    setTime(undefined);
+    setCategoryId(undefined);
   };
 
   return (
@@ -85,13 +99,34 @@ export const CreateHabitDialog = ({
                   aria-label={day.label}
                   className="h-10 data-[state=on]:bg-gold data-[state=on]:text-accent-foreground"
                 >
-                  {day.label}
+                  {day.short}
                 </ToggleGroupItem>
               ))}
             </ToggleGroup>
             <p className="text-xs text-muted-foreground">
               Select the days this habit should appear
             </p>
+          </div>
+
+          <div className="space-y-2">
+            <Label>Time (Optional)</Label>
+            <TimePicker value={time} onChange={setTime} />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="category">Category (Optional)</Label>
+            <Select value={categoryId} onValueChange={setCategoryId}>
+              <SelectTrigger id="category">
+                <SelectValue placeholder="Select a category" />
+              </SelectTrigger>
+              <SelectContent>
+                {TASK_CATEGORIES.map((category) => (
+                  <SelectItem key={category.id} value={category.id}>
+                    {category.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
 
           <div className="flex justify-end gap-2 pt-4">

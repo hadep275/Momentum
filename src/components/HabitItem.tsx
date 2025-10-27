@@ -1,7 +1,8 @@
 import { Card } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
-import { Pencil, Trash2 } from "lucide-react";
+import { CategoryBadge } from "@/components/CategoryBadge";
+import { Pencil, Trash2, Clock } from "lucide-react";
 import { Habit } from "@/types/task";
 import { format } from "date-fns";
 
@@ -44,9 +45,18 @@ export const HabitItem = ({
           <p className={`font-medium ${isCompletedToday ? "line-through text-muted-foreground" : ""}`}>
             {habit.title}
           </p>
-          <p className="text-xs text-muted-foreground">
-            {getDayNames(habit.daysOfWeek)}
-          </p>
+          <div className="flex flex-wrap items-center gap-2 mt-1">
+            <p className="text-xs text-muted-foreground">
+              {getDayNames(habit.daysOfWeek)}
+            </p>
+            {habit.time && (
+              <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                <Clock className="h-3 w-3" />
+                {habit.time}
+              </div>
+            )}
+            {habit.categoryId && <CategoryBadge categoryId={habit.categoryId} />}
+          </div>
         </div>
 
         <div className="flex gap-2">

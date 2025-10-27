@@ -22,9 +22,10 @@ interface TaskListProps {
   onUpdateTasks: (tasks: Task[]) => void;
   habits: Habit[];
   onUpdateHabits: (habits: Habit[]) => void;
+  hideCompletedHabits: boolean;
 }
 
-export const TaskList = ({ tasks, onUpdateTasks, habits, onUpdateHabits }: TaskListProps) => {
+export const TaskList = ({ tasks, onUpdateTasks, habits, onUpdateHabits, hideCompletedHabits }: TaskListProps) => {
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [isCreateHabitDialogOpen, setIsCreateHabitDialogOpen] = useState(false);
   const [isNewItemSheetOpen, setIsNewItemSheetOpen] = useState(false);
@@ -116,6 +117,16 @@ export const TaskList = ({ tasks, onUpdateTasks, habits, onUpdateHabits }: TaskL
     isCompletedToday: habit.completions.some((c) => c.date === todayFormatted),
   }));
 
+  // Filter habits by category
+  const filteredHabits = selectedCategory
+    ? habitsWithCompletion.filter((h) => h.habit.categoryId === selectedCategory)
+    : habitsWithCompletion;
+
+  // Filter out completed habits if the setting is enabled
+  const visibleHabits = hideCompletedHabits
+    ? filteredHabits.filter((h) => !h.isCompletedToday)
+    : filteredHabits;
+
   // Filter by category
   const filteredTasks = selectedCategory
     ? todaysTasks.filter((task) => task.categoryId === selectedCategory)
@@ -201,15 +212,19 @@ export const TaskList = ({ tasks, onUpdateTasks, habits, onUpdateHabits }: TaskL
       {/* Daily Habits Section */}
       <div>
         <h3 className="text-lg font-semibold mb-3">Daily Habits</h3>
-        {todaysHabits.length === 0 ? (
+        {visibleHabits.length === 0 ? (
           <Card className="p-8 text-center border-2 border-dashed bg-card">
             <p className="text-muted-foreground text-sm">
-              No habits scheduled for today.
+              {selectedCategory 
+                ? "No habits in this category for today."
+                : todaysHabits.length === 0 
+                  ? "No habits scheduled for today."
+                  : "No habits to show."}
             </p>
           </Card>
         ) : (
           <div className="space-y-3">
-            {habitsWithCompletion.map(({ habit, isCompletedToday }) => (
+            {visibleHabits.map(({ habit, isCompletedToday }) => (
               <HabitItem
                 key={habit.id}
                 habit={habit}

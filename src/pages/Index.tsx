@@ -2,14 +2,31 @@ import { useState, useEffect } from "react";
 import { Calendar } from "@/components/Calendar";
 import { TaskList } from "@/components/TaskList";
 import { TagManagement } from "@/components/TagManagement";
+import { AppSettings } from "@/components/AppSettings";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ListTodo, CalendarDays, BarChart3 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { ListTodo, CalendarDays, BarChart3, Settings } from "lucide-react";
 import { Task, Habit } from "@/types/task";
 
 const TASKS_STORAGE_KEY = "momentum-tasks";
 const HABITS_STORAGE_KEY = "momentum-habits";
+const SETTINGS_STORAGE_KEY = "momentum-settings";
 
 const Index = () => {
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [hideCompletedHabits, setHideCompletedHabits] = useState(() => {
+    const stored = localStorage.getItem(SETTINGS_STORAGE_KEY);
+    if (stored) {
+      try {
+        const settings = JSON.parse(stored);
+        return settings.hideCompletedHabits || false;
+      } catch (e) {
+        return false;
+      }
+    }
+    return false;
+  });
+
   const [tasks, setTasks] = useState<Task[]>(() => {
     // Load tasks from localStorage on initial render
     const stored = localStorage.getItem(TASKS_STORAGE_KEY);
@@ -59,14 +76,34 @@ const Index = () => {
     localStorage.setItem(HABITS_STORAGE_KEY, JSON.stringify(habits));
   }, [habits]);
 
+  // Save settings to localStorage whenever they change
+  useEffect(() => {
+    localStorage.setItem(
+      SETTINGS_STORAGE_KEY,
+      JSON.stringify({ hideCompletedHabits })
+    );
+  }, [hideCompletedHabits]);
+
   return (
     <div className="min-h-screen bg-background pb-20">
       <div className="container mx-auto py-8 px-4">
         <header className="mb-8 border-b-2 border-gold pb-6">
-          <h1 className="text-5xl font-bold text-gold drop-shadow-lg">
-            Momentum
-          </h1>
-          <p className="text-foreground mt-2 text-lg">Build your best self, one task at a time</p>
+          <div className="flex items-start justify-between">
+            <div>
+              <h1 className="text-5xl font-bold text-gold drop-shadow-lg">
+                Momentum
+              </h1>
+              <p className="text-foreground mt-2 text-lg">Build your best self, one task at a time</p>
+            </div>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setIsSettingsOpen(true)}
+              className="text-muted-foreground hover:text-gold"
+            >
+              <Settings className="h-6 w-6" />
+            </Button>
+          </div>
         </header>
 
         <Tabs defaultValue="tasks" className="w-full">
@@ -76,6 +113,7 @@ const Index = () => {
               onUpdateTasks={setTasks}
               habits={habits}
               onUpdateHabits={setHabits}
+              hideCompletedHabits={hideCompletedHabits}
             />
           </TabsContent>
 
@@ -100,6 +138,13 @@ const Index = () => {
             </TabsTrigger>
           </TabsList>
         </Tabs>
+
+        <AppSettings
+          open={isSettingsOpen}
+          onOpenChange={setIsSettingsOpen}
+          hideCompletedHabits={hideCompletedHabits}
+          onHideCompletedHabitsChange={setHideCompletedHabits}
+        />
       </div>
     </div>
   );

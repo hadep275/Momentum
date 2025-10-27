@@ -55,6 +55,8 @@ export interface Habit {
   id: string;
   title: string;
   daysOfWeek: number[]; // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
+  time?: string; // HH:mm format
+  categoryId?: string;
   completions: { date: string }[]; // ISO date strings when completed
   createdAt: Date;
 }
