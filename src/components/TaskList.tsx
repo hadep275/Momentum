@@ -58,9 +58,9 @@ export const TaskList = () => {
       </div>
 
       {tasks.length === 0 ? (
-        <Card className="p-12 text-center">
+        <Card className="p-12 text-center border-2 border-gold bg-card">
           <p className="text-muted-foreground mb-4">No tasks yet. Create your first task to get started!</p>
-          <Button onClick={() => setIsCreateDialogOpen(true)} variant="outline" className="gap-2">
+          <Button onClick={() => setIsCreateDialogOpen(true)} className="gap-2 bg-gold text-accent-foreground hover:bg-gold/90 border-2 border-copper">
             <Plus className="w-4 h-4" />
             Create Task
           </Button>

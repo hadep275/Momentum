@@ -57,7 +57,7 @@ export const ChecklistItem = ({ checklist, onUpdate }: ChecklistItemProps) => {
   };
 
   return (
-    <div className="flex items-center gap-2 p-2 rounded-lg hover:bg-muted/50 transition-colors">
+    <div className="flex items-center gap-2 p-2 rounded-lg hover:bg-muted transition-colors border border-gold/30">
       <Checkbox
         checked={checklist.completed}
         onCheckedChange={handleToggleComplete}

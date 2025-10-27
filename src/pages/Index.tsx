@@ -4,13 +4,13 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const Index = () => {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-rose-pink via-background to-gold/30">
+    <div className="min-h-screen bg-background">
       <div className="container mx-auto py-8 px-4">
-        <header className="mb-8">
-          <h1 className="text-5xl font-bold bg-gradient-to-r from-primary via-copper to-gold bg-clip-text text-transparent drop-shadow-sm">
+        <header className="mb-8 border-b-2 border-gold pb-6">
+          <h1 className="text-5xl font-bold text-gold drop-shadow-lg">
             Ultimate Productivity
           </h1>
-          <p className="text-foreground/70 mt-2 text-lg">Track tasks, time, and achieve your goals</p>
+          <p className="text-foreground mt-2 text-lg">Track tasks, time, and achieve your goals</p>
         </header>
 
         <Tabs defaultValue="tasks" className="w-full">
