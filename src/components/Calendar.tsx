@@ -376,13 +376,13 @@ export const Calendar = ({ tasks, habits, onUpdateTasks, onUpdateHabits }: Calen
                         onMouseEnter={() => setHoveredItemId(habit.id)}
                         onMouseLeave={() => setHoveredItemId(null)}
                       >
-                        <div className="flex items-center gap-3">
+                        <div className="flex items-start gap-3">
                           <Checkbox
                             checked={isCompletedOnDate}
                             onCheckedChange={() =>
                               handleToggleHabit(habit.id, selectedDateFormatted)
                             }
-                            className="rounded-full"
+                            className="rounded-full mt-1"
                           />
                           <div className="flex-1">
                             <p
@@ -400,21 +400,21 @@ export const Calendar = ({ tasks, habits, onUpdateTasks, onUpdateHabits }: Calen
                                 {habit.time}
                               </div>
                             )}
+                            {habit.categoryId && (
+                              <Badge
+                                variant="outline"
+                                className={`bg-${getCategoryColor(
+                                  habit.categoryId
+                                )}/10 mt-2`}
+                              >
+                                {
+                                  TASK_CATEGORIES.find(
+                                    (c) => c.id === habit.categoryId
+                                  )?.name
+                                }
+                              </Badge>
+                            )}
                           </div>
-                          {habit.categoryId && (
-                            <Badge
-                              variant="outline"
-                              className={`bg-${getCategoryColor(
-                                habit.categoryId
-                              )}/10`}
-                            >
-                              {
-                                TASK_CATEGORIES.find(
-                                  (c) => c.id === habit.categoryId
-                                )?.name
-                              }
-                            </Badge>
-                          )}
                           {hoveredItemId === habit.id && (
                             <div className="flex gap-1 absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
                               <Button
