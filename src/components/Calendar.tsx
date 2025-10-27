@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ChevronLeft, ChevronRight, Clock } from "lucide-react";
+import { ChevronLeft, ChevronRight, Clock, Pencil, Trash2 } from "lucide-react";
 import { Task, Habit, TASK_CATEGORIES } from "@/types/task";
 import {
   startOfMonth,
@@ -25,16 +25,22 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { Checkbox } from "@/components/ui/checkbox";
+import { EditTaskDialog } from "@/components/EditTaskDialog";
+import { EditHabitDialog } from "@/components/EditHabitDialog";
 
 interface CalendarProps {
   tasks: Task[];
   habits: Habit[];
   onUpdateTasks: (tasks: Task[]) => void;
+  onUpdateHabits: (habits: Habit[]) => void;
 }
 
-export const Calendar = ({ tasks, habits, onUpdateTasks }: CalendarProps) => {
+export const Calendar = ({ tasks, habits, onUpdateTasks, onUpdateHabits }: CalendarProps) => {
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const [editingTask, setEditingTask] = useState<Task | null>(null);
+  const [editingHabit, setEditingHabit] = useState<Habit | null>(null);
+  const [hoveredItemId, setHoveredItemId] = useState<string | null>(null);
 
   const monthStart = startOfMonth(currentMonth);
   const monthEnd = endOfMonth(currentMonth);
@@ -75,6 +81,37 @@ export const Calendar = ({ tasks, habits, onUpdateTasks }: CalendarProps) => {
     );
   };
 
+  const handleToggleHabit = (habitId: string, date: string) => {
+    const habit = habits.find((h) => h.id === habitId);
+    if (!habit) return;
+
+    const isCompletedOnDate = habit.completions.some((c) => c.date === date);
+    const updatedHabit: Habit = {
+      ...habit,
+      completions: isCompletedOnDate
+        ? habit.completions.filter((c) => c.date !== date)
+        : [...habit.completions, { date }],
+    };
+
+    onUpdateHabits(habits.map((h) => (h.id === habitId ? updatedHabit : h)));
+  };
+
+  const handleUpdateTask = (updatedTask: Task) => {
+    onUpdateTasks(tasks.map((t) => (t.id === updatedTask.id ? updatedTask : t)));
+  };
+
+  const handleDeleteTask = (taskId: string) => {
+    onUpdateTasks(tasks.filter((t) => t.id !== taskId));
+  };
+
+  const handleUpdateHabit = (updatedHabit: Habit) => {
+    onUpdateHabits(habits.map((h) => (h.id === updatedHabit.id ? updatedHabit : h)));
+  };
+
+  const handleDeleteHabit = (habitId: string) => {
+    onUpdateHabits(habits.filter((h) => h.id !== habitId));
+  };
+
   const selectedDateTasks = selectedDate ? getTasksForDate(selectedDate) : [];
   const selectedDateHabits = selectedDate ? getHabitsForDate(selectedDate) : [];
   const selectedDateFormatted = selectedDate ? format(selectedDate, "yyyy-MM-dd") : "";
@@ -110,6 +147,9 @@ export const Calendar = ({ tasks, habits, onUpdateTasks }: CalendarProps) => {
     const category = TASK_CATEGORIES.find((c) => c.id === categoryId);
     return category?.color || "gold";
   };
+
+  // Get all unique tags from tasks for autocomplete
+  const allTags = Array.from(new Set(tasks.flatMap((task) => task.tags)));
 
   return (
     <div className="space-y-4">
@@ -233,7 +273,9 @@ export const Calendar = ({ tasks, habits, onUpdateTasks }: CalendarProps) => {
                   {sortedSelectedTasks.map((task) => (
                     <Card
                       key={task.id}
-                      className="p-4 hover:border-gold/50 transition-colors"
+                      className="p-4 hover:border-gold/50 transition-colors relative group"
+                      onMouseEnter={() => setHoveredItemId(task.id)}
+                      onMouseLeave={() => setHoveredItemId(null)}
                     >
                       <div className="flex items-start gap-3">
                         <Checkbox
@@ -288,6 +330,26 @@ export const Calendar = ({ tasks, habits, onUpdateTasks }: CalendarProps) => {
                             </div>
                           )}
                         </div>
+                        {hoveredItemId === task.id && (
+                          <div className="flex gap-1 absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-8 w-8"
+                              onClick={() => setEditingTask(task)}
+                            >
+                              <Pencil className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-8 w-8 text-destructive hover:text-destructive"
+                              onClick={() => handleDeleteTask(task.id)}
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        )}
                       </div>
                     </Card>
                   ))}
@@ -310,21 +372,23 @@ export const Calendar = ({ tasks, habits, onUpdateTasks }: CalendarProps) => {
                     return (
                       <Card
                         key={habit.id}
-                        className="p-4 hover:border-gold/50 transition-colors"
+                        className="p-4 hover:border-gold/50 transition-colors relative group"
+                        onMouseEnter={() => setHoveredItemId(habit.id)}
+                        onMouseLeave={() => setHoveredItemId(null)}
                       >
                         <div className="flex items-center gap-3">
-                          <div
-                            className={`h-3 w-3 rounded-full ${
-                              isCompletedOnDate
-                                ? "bg-gold"
-                                : "bg-muted border-2 border-muted-foreground"
-                            }`}
+                          <Checkbox
+                            checked={isCompletedOnDate}
+                            onCheckedChange={() =>
+                              handleToggleHabit(habit.id, selectedDateFormatted)
+                            }
+                            className="rounded-full"
                           />
                           <div className="flex-1">
                             <p
                               className={`font-medium ${
                                 isCompletedOnDate
-                                  ? "text-muted-foreground"
+                                  ? "line-through text-muted-foreground"
                                   : ""
                               }`}
                             >
@@ -351,6 +415,26 @@ export const Calendar = ({ tasks, habits, onUpdateTasks }: CalendarProps) => {
                               }
                             </Badge>
                           )}
+                          {hoveredItemId === habit.id && (
+                            <div className="flex gap-1 absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-8 w-8"
+                                onClick={() => setEditingHabit(habit)}
+                              >
+                                <Pencil className="h-4 w-4" />
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-8 w-8 text-destructive hover:text-destructive"
+                                onClick={() => handleDeleteHabit(habit.id)}
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          )}
                         </div>
                       </Card>
                     );
@@ -370,6 +454,22 @@ export const Calendar = ({ tasks, habits, onUpdateTasks }: CalendarProps) => {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Edit Dialogs */}
+      <EditTaskDialog
+        open={!!editingTask}
+        onOpenChange={(open) => !open && setEditingTask(null)}
+        task={editingTask}
+        onUpdateTask={handleUpdateTask}
+        existingTags={allTags}
+      />
+
+      <EditHabitDialog
+        open={!!editingHabit}
+        onOpenChange={(open) => !open && setEditingHabit(null)}
+        habit={editingHabit}
+        onUpdateHabit={handleUpdateHabit}
+      />
     </div>
   );
 };
