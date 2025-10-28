@@ -16,11 +16,11 @@ export default defineConfig(({ mode }) => ({
     mode === "development" && componentTagger(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['logo-option-2.png', 'robots.txt'],
+      includeAssets: ['momentum-logo.png', 'robots.txt'],
       manifest: {
-        name: 'Momentum - Productivity App',
+        name: 'Momentum',
         short_name: 'Momentum',
-        description: 'Build your best self, one task at a time. Mobile-first productivity app with tasks, habits, and smart reminders.',
+        description: 'Build your best self, one task at a time.',
         theme_color: '#52233F',
         background_color: '#0A0118',
         display: 'standalone',
@@ -29,7 +29,7 @@ export default defineConfig(({ mode }) => ({
         start_url: '/Momentum/',
         icons: [
           {
-            src: 'logo-option-2.png',
+            src: 'momentum-logo.png',
             sizes: '512x512',
             type: 'image/png',
             purpose: 'any maskable'
