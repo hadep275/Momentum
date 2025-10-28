@@ -19,12 +19,21 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 import { Trash2 } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface AppSettingsProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   hideCompletedHabits: boolean;
   onHideCompletedHabitsChange: (hide: boolean) => void;
+  theme: string;
+  onThemeChange: (theme: string) => void;
   onResetData: () => void;
 }
 
@@ -33,6 +42,8 @@ export const AppSettings = ({
   onOpenChange,
   hideCompletedHabits,
   onHideCompletedHabitsChange,
+  theme,
+  onThemeChange,
   onResetData,
 }: AppSettingsProps) => {
   return (
@@ -54,6 +65,25 @@ export const AppSettings = ({
               checked={hideCompletedHabits}
               onCheckedChange={onHideCompletedHabitsChange}
             />
+          </div>
+
+          <div className="space-y-3">
+            <div className="space-y-0.5">
+              <Label htmlFor="theme-select">Theme</Label>
+              <p className="text-sm text-muted-foreground">
+                Choose your preferred color scheme
+              </p>
+            </div>
+            <Select value={theme} onValueChange={onThemeChange}>
+              <SelectTrigger id="theme-select" className="w-full">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="default">Default (Pink & Gold)</SelectItem>
+                <SelectItem value="light">Light Mode</SelectItem>
+                <SelectItem value="dark">Dark Mode</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
 
           <div className="border-t pt-6">

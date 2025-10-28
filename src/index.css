@@ -7,6 +7,7 @@ All colors MUST be HSL.
 */
 
 @layer base {
+  /* Default theme - Pink/Gold (your current design) */
   :root {
     --background: 328 48% 25%;
     --foreground: 45 95% 88%;
@@ -54,42 +55,89 @@ All colors MUST be HSL.
     --dusty-pink: 340 65% 58%;
   }
 
-  .dark {
-    --background: 328 48% 25%;
-    --foreground: 45 95% 88%;
+  /* Light theme - Pink/Gold colors in light mode */
+  .theme-light {
+    --background: 45 90% 97%;
+    --foreground: 328 48% 15%;
 
-    --card: 340 55% 35%;
-    --card-foreground: 45 90% 92%;
+    --card: 45 85% 92%;
+    --card-foreground: 328 48% 20%;
 
-    --popover: 340 50% 32%;
-    --popover-foreground: 45 90% 92%;
+    --popover: 45 88% 95%;
+    --popover-foreground: 328 48% 20%;
 
     --primary: 345 85% 58%;
-    --primary-foreground: 45 95% 88%;
+    --primary-foreground: 45 95% 98%;
 
-    --secondary: 340 60% 45%;
-    --secondary-foreground: 45 90% 92%;
+    --secondary: 340 60% 88%;
+    --secondary-foreground: 328 48% 20%;
 
-    --muted: 340 45% 38%;
-    --muted-foreground: 45 60% 85%;
+    --muted: 340 45% 90%;
+    --muted-foreground: 328 35% 35%;
 
     --accent: 45 88% 62%;
     --accent-foreground: 328 48% 20%;
 
     --destructive: 0 75% 55%;
-    --destructive-foreground: 45 90% 92%;
+    --destructive-foreground: 45 90% 98%;
 
-    --border: 45 85% 58%;
-    --input: 340 50% 32%;
+    --border: 340 40% 80%;
+    --input: 340 45% 92%;
     --ring: 45 88% 62%;
 
-    --sidebar-background: 340 50% 30%;
+    --sidebar-background: 45 85% 94%;
+    --sidebar-foreground: 328 48% 20%;
+    --sidebar-primary: 345 85% 58%;
+    --sidebar-primary-foreground: 45 95% 98%;
+    --sidebar-accent: 340 45% 90%;
+    --sidebar-accent-foreground: 328 48% 20%;
+    --sidebar-border: 340 40% 80%;
+    --sidebar-ring: 45 88% 62%;
+
+    --copper: 28 75% 58%;
+    --gold: 45 88% 62%;
+    --rose-gold: 15 80% 68%;
+    --rose-pink: 345 85% 68%;
+    --dusty-pink: 340 65% 58%;
+  }
+
+  /* Dark theme - Pink/Gold colors in dark mode */
+  .theme-dark {
+    --background: 328 48% 12%;
+    --foreground: 45 95% 88%;
+
+    --card: 340 55% 18%;
+    --card-foreground: 45 90% 92%;
+
+    --popover: 340 50% 15%;
+    --popover-foreground: 45 90% 92%;
+
+    --primary: 345 85% 58%;
+    --primary-foreground: 45 95% 88%;
+
+    --secondary: 340 60% 25%;
+    --secondary-foreground: 45 90% 92%;
+
+    --muted: 340 45% 20%;
+    --muted-foreground: 45 60% 75%;
+
+    --accent: 45 88% 62%;
+    --accent-foreground: 328 48% 10%;
+
+    --destructive: 0 75% 55%;
+    --destructive-foreground: 45 90% 92%;
+
+    --border: 340 40% 25%;
+    --input: 340 50% 18%;
+    --ring: 45 88% 62%;
+
+    --sidebar-background: 340 50% 15%;
     --sidebar-foreground: 45 90% 88%;
     --sidebar-primary: 345 85% 58%;
     --sidebar-primary-foreground: 45 95% 88%;
-    --sidebar-accent: 340 45% 38%;
+    --sidebar-accent: 340 45% 20%;
     --sidebar-accent-foreground: 45 90% 88%;
-    --sidebar-border: 45 85% 58%;
+    --sidebar-border: 340 40% 25%;
     --sidebar-ring: 45 88% 62%;
 
     --copper: 28 75% 58%;

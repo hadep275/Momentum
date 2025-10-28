@@ -31,6 +31,11 @@ const Index = () => {
     return false;
   });
 
+  const [theme, setTheme] = useState(() => {
+    const stored = localStorage.getItem("momentum-theme");
+    return stored || "default";
+  });
+
   const [tasks, setTasks] = useState<Task[]>(() => {
     // Load tasks from localStorage on initial render
     const stored = localStorage.getItem(TASKS_STORAGE_KEY);
@@ -87,6 +92,21 @@ const Index = () => {
       JSON.stringify({ hideCompletedHabits })
     );
   }, [hideCompletedHabits]);
+
+  // Handle theme changes
+  const handleThemeChange = (newTheme: string) => {
+    setTheme(newTheme);
+    localStorage.setItem("momentum-theme", newTheme);
+    
+    const root = document.documentElement;
+    root.classList.remove("theme-light", "theme-dark");
+    
+    if (newTheme === "light") {
+      root.classList.add("theme-light");
+    } else if (newTheme === "dark") {
+      root.classList.add("theme-dark");
+    }
+  };
 
   // Initialize notification scheduler
   useNotificationScheduler(tasks, habits);
@@ -183,6 +203,8 @@ const Index = () => {
           onOpenChange={setIsSettingsOpen}
           hideCompletedHabits={hideCompletedHabits}
           onHideCompletedHabitsChange={setHideCompletedHabits}
+          theme={theme}
+          onThemeChange={handleThemeChange}
           onResetData={handleResetData}
         />
 
