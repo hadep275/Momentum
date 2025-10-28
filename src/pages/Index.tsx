@@ -133,7 +133,7 @@ const Index = () => {
               variant="ghost"
               size="icon"
               onClick={() => setIsSettingsOpen(true)}
-              className="text-muted-foreground hover:text-gold"
+              className="text-muted-foreground hover:text-foreground hover:bg-accent"
             >
               <Settings className="h-6 w-6" />
             </Button>
