@@ -18,7 +18,9 @@ import {
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
-import { Trash2 } from "lucide-react";
+import { Trash2, Bell } from "lucide-react";
+import { useNotifications } from "@/hooks/useNotifications";
+import { toast } from "sonner";
 import {
   Select,
   SelectContent,
@@ -46,6 +48,28 @@ export const AppSettings = ({
   onThemeChange,
   onResetData,
 }: AppSettingsProps) => {
+  const { permission, isSupported, requestPermission } = useNotifications();
+
+  const handleNotificationRequest = async () => {
+    if (!isSupported) {
+      toast.error("Notifications not supported", {
+        description: "Your browser doesn't support notifications"
+      });
+      return;
+    }
+
+    const granted = await requestPermission();
+    if (granted) {
+      toast.success("Notifications enabled!", {
+        description: "You'll receive reminders for tasks and habits"
+      });
+    } else {
+      toast.error("Notifications blocked", {
+        description: "Please enable notifications in your browser settings"
+      });
+    }
+  };
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-md">
@@ -65,6 +89,36 @@ export const AppSettings = ({
               checked={hideCompletedHabits}
               onCheckedChange={onHideCompletedHabitsChange}
             />
+          </div>
+
+          <div className="space-y-3">
+            <div className="space-y-0.5">
+              <Label>Notifications</Label>
+              <p className="text-sm text-muted-foreground">
+                {permission === 'granted' 
+                  ? 'Notifications are enabled' 
+                  : permission === 'denied'
+                  ? 'Notifications are blocked. Enable in browser settings.'
+                  : 'Enable notifications for task and habit reminders'}
+              </p>
+            </div>
+            {permission !== 'granted' && isSupported && (
+              <Button 
+                onClick={handleNotificationRequest}
+                variant="outline"
+                className="w-full"
+                size="sm"
+              >
+                <Bell className="h-4 w-4 mr-2" />
+                Enable Notifications
+              </Button>
+            )}
+            {permission === 'granted' && (
+              <div className="flex items-center gap-2 text-sm text-green-600 dark:text-green-400">
+                <Bell className="h-4 w-4" />
+                <span>Notifications enabled</span>
+              </div>
+            )}
           </div>
 
           <div className="space-y-3">

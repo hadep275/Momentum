@@ -16,27 +16,30 @@ export const useNotificationScheduler = (tasks: Task[], habits: Habit[]) => {
       tasks.forEach((task) => {
         if (task.completed || !task.reminderMinutes) return;
 
-        const dueDate = new Date(task.dueDate);
-        
-        // If task has a specific time, use it
+        // Combine date and time properly
+        const dueDateTime = new Date(task.dueDate);
         if (task.dueTime) {
           const [hours, minutes] = task.dueTime.split(':').map(Number);
-          dueDate.setHours(hours, minutes, 0, 0);
+          dueDateTime.setHours(hours, minutes, 0, 0);
+        } else {
+          // No specific time, default to end of day
+          dueDateTime.setHours(23, 59, 0, 0);
         }
 
-        const minutesUntilDue = differenceInMinutes(dueDate, now);
-        const notificationKey = `task-${task.id}-${format(dueDate, 'yyyy-MM-dd-HH:mm')}`;
+        const minutesUntilDue = differenceInMinutes(dueDateTime, now);
+        const notificationKey = `task-${task.id}-${format(dueDateTime, 'yyyy-MM-dd-HH:mm')}`;
 
-        // Check if we should notify (within reminder window and not already notified)
+        // Notify if we're in the reminder window (e.g., 15 minutes before)
+        // and haven't notified yet
         if (
           minutesUntilDue <= task.reminderMinutes &&
-          minutesUntilDue > 0 &&
+          minutesUntilDue >= -5 && // Allow 5 min grace period after due time
           !sessionStorage.getItem(notificationKey)
         ) {
           showNotification(`⏰ Task Due Soon: ${task.title}`, {
             body: task.dueTime 
               ? `Due at ${task.dueTime}` 
-              : `Due ${format(dueDate, 'MMM dd, yyyy')}`,
+              : `Due ${format(dueDateTime, 'MMM dd, yyyy')}`,
             tag: task.id,
           });
           sessionStorage.setItem(notificationKey, 'notified');
@@ -69,7 +72,7 @@ export const useNotificationScheduler = (tasks: Task[], habits: Habit[]) => {
 
         if (
           minutesUntilHabit <= habit.reminderMinutes &&
-          minutesUntilHabit > 0 &&
+          minutesUntilHabit >= -5 && // Allow 5 min grace period
           !sessionStorage.getItem(notificationKey)
         ) {
           showNotification(`🔔 Habit Reminder: ${habit.title}`, {

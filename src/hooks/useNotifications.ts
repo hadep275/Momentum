@@ -35,8 +35,8 @@ export const useNotifications = () => {
 
     try {
       new Notification(title, {
-        icon: '/logo-option-2.png',
-        badge: '/logo-option-2.png',
+        icon: '/momentum-logo.png',
+        badge: '/momentum-logo.png',
         ...options,
       });
     } catch (error) {
