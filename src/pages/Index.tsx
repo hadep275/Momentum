@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { ListTodo, CalendarDays, BarChart3, Settings } from "lucide-react";
 import { Task, Habit } from "@/types/task";
 import { useNotificationScheduler } from "@/hooks/useNotificationScheduler";
+import { toast } from "sonner";
 import momentumLogo from "@/assets/momentum-logo.png";
 
 const TASKS_STORAGE_KEY = "momentum-tasks";
@@ -90,6 +91,26 @@ const Index = () => {
   // Initialize notification scheduler
   useNotificationScheduler(tasks, habits);
 
+  const handleResetData = () => {
+    // Clear localStorage
+    localStorage.removeItem(TASKS_STORAGE_KEY);
+    localStorage.removeItem(HABITS_STORAGE_KEY);
+    localStorage.removeItem(SETTINGS_STORAGE_KEY);
+    
+    // Reset state
+    setTasks([]);
+    setHabits([]);
+    setHideCompletedHabits(false);
+    
+    // Close settings dialog
+    setIsSettingsOpen(false);
+    
+    // Show confirmation
+    toast.success("All data cleared successfully", {
+      description: "Your app has been reset to a fresh start",
+    });
+  };
+
   return (
     <div className="min-h-screen bg-background pb-20">
       <div className="container mx-auto py-8 px-4">
@@ -162,6 +183,7 @@ const Index = () => {
           onOpenChange={setIsSettingsOpen}
           hideCompletedHabits={hideCompletedHabits}
           onHideCompletedHabitsChange={setHideCompletedHabits}
+          onResetData={handleResetData}
         />
 
         <InstallPWA />
