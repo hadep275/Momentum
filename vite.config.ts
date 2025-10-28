@@ -25,11 +25,11 @@ export default defineConfig(({ mode }) => ({
         background_color: '#0A0118',
         display: 'standalone',
         orientation: 'portrait',
-        scope: '/',
-        start_url: '/',
+        scope: '/Momentum/',
+        start_url: '/Momentum/',
         icons: [
           {
-            src: '/logo-option-2.png',
+            src: 'logo-option-2.png',
             sizes: '512x512',
             type: 'image/png',
             purpose: 'any maskable'
