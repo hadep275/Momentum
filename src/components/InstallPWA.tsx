@@ -15,6 +15,7 @@ export const InstallPWA = () => {
   const [isInstalled, setIsInstalled] = useState(false);
   const [isIOS, setIsIOS] = useState(false);
   const [showIOSInstructions, setShowIOSInstructions] = useState(false);
+  const [showNotificationPrompt, setShowNotificationPrompt] = useState(true);
   const { permission, isSupported, requestPermission } = useNotifications();
 
   useEffect(() => {
@@ -142,8 +143,17 @@ export const InstallPWA = () => {
       )}
 
       {/* Notification Permission Prompt */}
-      {!showInstallPrompt && !showIOSInstructions && isSupported && permission === 'default' && (
+      {!showInstallPrompt && !showIOSInstructions && isSupported && permission === 'default' && showNotificationPrompt && (
         <Card className="p-4 border-2 border-gold/30 bg-card/95 backdrop-blur-sm shadow-xl">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="absolute top-2 right-2 h-6 w-6"
+            onClick={() => setShowNotificationPrompt(false)}
+          >
+            <X className="h-4 w-4" />
+          </Button>
+          
           <div className="flex items-start gap-3">
             <div className="p-2 rounded-lg bg-gold/10">
               <Bell className="h-5 w-5 text-gold" />
