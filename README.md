@@ -4,6 +4,8 @@
 
 **URL**: https://lovable.dev/projects/0e3ef019-7930-4d94-aecc-f6670cc8461e
 
+**Live App**: https://hadep275.github.io/Momentum/
+
 ## How can I edit this code?
 
 There are several ways of editing your application.
