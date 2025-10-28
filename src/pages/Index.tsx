@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { ListTodo, CalendarDays, BarChart3, Settings } from "lucide-react";
 import { Task, Habit } from "@/types/task";
 import { useNotificationScheduler } from "@/hooks/useNotificationScheduler";
+import momentumLogo from "@/assets/momentum-logo.png";
 
 const TASKS_STORAGE_KEY = "momentum-tasks";
 const HABITS_STORAGE_KEY = "momentum-habits";
@@ -94,11 +95,18 @@ const Index = () => {
       <div className="container mx-auto py-8 px-4">
         <header className="mb-8 border-b-2 border-gold pb-6">
           <div className="flex items-start justify-between">
-            <div>
-              <h1 className="text-5xl font-bold text-gold drop-shadow-lg">
-                Momentum
-              </h1>
-              <p className="text-foreground mt-2 text-lg">Build your best self, one day at a time</p>
+            <div className="flex items-center gap-4">
+              <img 
+                src={momentumLogo} 
+                alt="Momentum Logo" 
+                className="h-16 w-16 object-contain"
+              />
+              <div>
+                <h1 className="text-5xl font-bold text-gold drop-shadow-lg">
+                  Momentum
+                </h1>
+                <p className="text-foreground mt-2 text-lg">Build your best self, one day at a time</p>
+              </div>
             </div>
             <Button
               variant="ghost"
