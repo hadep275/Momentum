@@ -78,13 +78,23 @@ export const TaskItem = ({ task, onUpdate, onDelete, existingTags = [] }: TaskIt
     if (!task.dueDate) return null;
     
     const now = new Date();
-    const daysUntilDue = differenceInDays(task.dueDate, now);
     
+    // Combine date and time if dueTime is provided
+    let dueDateTime = new Date(task.dueDate);
+    if (task.dueTime) {
+      const [hours, minutes] = task.dueTime.split(':').map(Number);
+      dueDateTime.setHours(hours, minutes, 0, 0);
+    } else {
+      // If no time specified, set to end of day for comparison
+      dueDateTime.setHours(23, 59, 59, 999);
+    }
+    
+    const daysUntilDue = differenceInDays(task.dueDate, now);
     const timeText = task.dueTime ? ` at ${task.dueTime}` : '';
     
-    if (isPast(task.dueDate) && !task.completed) {
+    if (isPast(dueDateTime) && !task.completed) {
       return {
-        text: `Overdue by ${formatDistanceToNow(task.dueDate)}${timeText}`,
+        text: `Overdue by ${formatDistanceToNow(dueDateTime)}${timeText}`,
         variant: "destructive" as const,
         color: "text-destructive"
       };
