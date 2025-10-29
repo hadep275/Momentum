@@ -219,23 +219,13 @@ export const TaskList = ({ tasks, onUpdateTasks, habits, onUpdateHabits, hideCom
           <h2 className="text-2xl font-semibold">Today's Focus</h2>
           <p className="text-sm text-muted-foreground">Tasks and habits for today</p>
         </div>
-        <div className="flex gap-2">
-          <Button 
-            onClick={() => setIsTemplatesDialogOpen(true)}
-            variant="outline"
-            size="icon"
-            className="h-12 w-12 rounded-full min-h-[44px] border-2 border-secondary"
-          >
-            <Layers className="w-5 h-5" />
-          </Button>
-          <Button 
-            onClick={() => setIsNewItemSheetOpen(true)} 
-            size="icon"
-            className="h-12 w-12 rounded-full min-h-[44px]"
-          >
-            <Plus className="w-5 h-5" />
-          </Button>
-        </div>
+        <Button 
+          onClick={() => setIsNewItemSheetOpen(true)} 
+          size="icon"
+          className="h-12 w-12 rounded-full min-h-[44px]"
+        >
+          <Plus className="w-5 h-5" />
+        </Button>
       </div>
 
       <SearchBar value={searchQuery} onChange={setSearchQuery} />
@@ -320,7 +310,7 @@ export const TaskList = ({ tasks, onUpdateTasks, habits, onUpdateHabits, hideCom
               }}
             >
               <div className="flex flex-col items-center text-center gap-3">
-                <Layers className="w-8 h-8 text-secondary" />
+                <Layers className="w-8 h-8 text-gold" />
                 <div>
                   <h4 className="font-semibold">Template</h4>
                   <p className="text-xs text-muted-foreground">Quick task sets</p>
