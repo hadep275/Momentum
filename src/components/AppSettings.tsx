@@ -34,6 +34,8 @@ interface AppSettingsProps {
   onOpenChange: (open: boolean) => void;
   hideCompletedHabits: boolean;
   onHideCompletedHabitsChange: (hide: boolean) => void;
+  hideCompletedTasks: boolean;
+  onHideCompletedTasksChange: (hide: boolean) => void;
   theme: string;
   onThemeChange: (theme: string) => void;
   onResetData: () => void;
@@ -44,6 +46,8 @@ export const AppSettings = ({
   onOpenChange,
   hideCompletedHabits,
   onHideCompletedHabitsChange,
+  hideCompletedTasks,
+  onHideCompletedTasksChange,
   theme,
   onThemeChange,
   onResetData,
@@ -79,13 +83,27 @@ export const AppSettings = ({
         <div className="space-y-6 py-4">
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">
-              <Label htmlFor="hide-completed">Hide completed habits</Label>
+              <Label htmlFor="hide-completed-tasks">Hide completed tasks</Label>
+              <p className="text-sm text-muted-foreground">
+                Completed tasks will be hidden from view
+              </p>
+            </div>
+            <Switch
+              id="hide-completed-tasks"
+              checked={hideCompletedTasks}
+              onCheckedChange={onHideCompletedTasksChange}
+            />
+          </div>
+
+          <div className="flex items-center justify-between">
+            <div className="space-y-0.5">
+              <Label htmlFor="hide-completed-habits">Hide completed habits</Label>
               <p className="text-sm text-muted-foreground">
                 Completed habits will be hidden from view
               </p>
             </div>
             <Switch
-              id="hide-completed"
+              id="hide-completed-habits"
               checked={hideCompletedHabits}
               onCheckedChange={onHideCompletedHabitsChange}
             />

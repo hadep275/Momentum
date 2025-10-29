@@ -31,6 +31,19 @@ const Index = () => {
     return false;
   });
 
+  const [hideCompletedTasks, setHideCompletedTasks] = useState(() => {
+    const stored = localStorage.getItem(SETTINGS_STORAGE_KEY);
+    if (stored) {
+      try {
+        const settings = JSON.parse(stored);
+        return settings.hideCompletedTasks || false;
+      } catch (e) {
+        return false;
+      }
+    }
+    return false;
+  });
+
   const [theme, setTheme] = useState(() => {
     const stored = localStorage.getItem("momentum-theme");
     return stored || "default";
@@ -89,9 +102,9 @@ const Index = () => {
   useEffect(() => {
     localStorage.setItem(
       SETTINGS_STORAGE_KEY,
-      JSON.stringify({ hideCompletedHabits })
+      JSON.stringify({ hideCompletedHabits, hideCompletedTasks })
     );
-  }, [hideCompletedHabits]);
+  }, [hideCompletedHabits, hideCompletedTasks]);
 
   // Handle theme changes
   const handleThemeChange = (newTheme: string) => {
@@ -121,6 +134,7 @@ const Index = () => {
     setTasks([]);
     setHabits([]);
     setHideCompletedHabits(false);
+    setHideCompletedTasks(false);
     
     // Close settings dialog
     setIsSettingsOpen(false);
@@ -168,6 +182,7 @@ const Index = () => {
               habits={habits}
               onUpdateHabits={setHabits}
               hideCompletedHabits={hideCompletedHabits}
+              hideCompletedTasks={hideCompletedTasks}
             />
           </TabsContent>
 
@@ -203,6 +218,8 @@ const Index = () => {
           onOpenChange={setIsSettingsOpen}
           hideCompletedHabits={hideCompletedHabits}
           onHideCompletedHabitsChange={setHideCompletedHabits}
+          hideCompletedTasks={hideCompletedTasks}
+          onHideCompletedTasksChange={setHideCompletedTasks}
           theme={theme}
           onThemeChange={handleThemeChange}
           onResetData={handleResetData}

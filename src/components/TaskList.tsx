@@ -24,9 +24,10 @@ interface TaskListProps {
   habits: Habit[];
   onUpdateHabits: (habits: Habit[]) => void;
   hideCompletedHabits: boolean;
+  hideCompletedTasks: boolean;
 }
 
-export const TaskList = ({ tasks, onUpdateTasks, habits, onUpdateHabits, hideCompletedHabits }: TaskListProps) => {
+export const TaskList = ({ tasks, onUpdateTasks, habits, onUpdateHabits, hideCompletedHabits, hideCompletedTasks }: TaskListProps) => {
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [isCreateHabitDialogOpen, setIsCreateHabitDialogOpen] = useState(false);
   const [isNewItemSheetOpen, setIsNewItemSheetOpen] = useState(false);
@@ -150,9 +151,14 @@ export const TaskList = ({ tasks, onUpdateTasks, habits, onUpdateHabits, hideCom
     ? todaysTasks.filter((task) => task.categoryId === selectedCategory)
     : todaysTasks;
 
+  // Filter out completed tasks if the setting is enabled
+  const visibleTasks = hideCompletedTasks
+    ? categoryFilteredTasks.filter((task) => !task.completed)
+    : categoryFilteredTasks;
+
   // Filter by search query
   const searchFilteredTasks = searchQuery.trim()
-    ? categoryFilteredTasks.filter((task) => {
+    ? visibleTasks.filter((task) => {
         const query = searchQuery.toLowerCase();
         return (
           task.title.toLowerCase().includes(query) ||
@@ -160,7 +166,7 @@ export const TaskList = ({ tasks, onUpdateTasks, habits, onUpdateHabits, hideCom
           task.tags.some((tag) => tag.toLowerCase().includes(query))
         );
       })
-    : categoryFilteredTasks;
+    : visibleTasks;
 
   // Filter habits by search query
   const searchFilteredHabits = searchQuery.trim()
