@@ -2,13 +2,13 @@ import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { TemplateTask } from "@/types/template";
 import { TASK_CATEGORIES } from "@/types/task";
 import { Plus, Trash2, Clock, ListChecks } from "lucide-react";
 import { TagInput } from "@/components/TagInput";
+import { VoiceTextarea } from "@/components/VoiceTextarea";
 
 interface CreateTemplateDialogProps {
   open: boolean;
@@ -107,7 +107,7 @@ export const CreateTemplateDialog = ({
 
           <div className="space-y-2">
             <Label htmlFor="template-description">Description (optional)</Label>
-            <Textarea
+            <VoiceTextarea
               id="template-description"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
@@ -151,7 +151,7 @@ export const CreateTemplateDialog = ({
                     placeholder="Task title"
                   />
 
-                  <Textarea
+                  <VoiceTextarea
                     value={task.description || ""}
                     onChange={(e) => handleUpdateTask(index, { description: e.target.value })}
                     placeholder="Description (optional)"
