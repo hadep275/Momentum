@@ -8,6 +8,10 @@ export interface TemplateTask {
   categoryId?: string;
   tags: string[];
   durationMinutes?: number; // Expected duration
+  checklists?: {
+    title: string;
+    timeEstimate?: number; // in seconds
+  }[];
 }
 
 export interface Template {

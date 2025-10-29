@@ -51,7 +51,12 @@ export const TemplatesDialog = ({
       priority: templateTask.priority,
       categoryId: templateTask.categoryId,
       tags: templateTask.tags,
-      checklists: [],
+      checklists: templateTask.checklists?.map((checklist) => ({
+        id: crypto.randomUUID(),
+        title: checklist.title,
+        completed: false,
+        timeSpent: 0,
+      })) || [],
       completed: false,
       createdAt: new Date(),
     }));
@@ -128,9 +133,9 @@ export const TemplatesDialog = ({
   return (
     <>
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="max-w-4xl max-h-[90vh]">
+        <DialogContent className="max-w-4xl max-h-[90vh] w-[95vw]">
           <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
+            <DialogTitle className="flex flex-col sm:flex-row items-start sm:items-center gap-2">
               <span>Task Templates</span>
               <Button onClick={() => setIsCreateDialogOpen(true)} size="sm" variant="outline">
                 <Plus className="h-4 w-4 mr-1" />
@@ -139,7 +144,7 @@ export const TemplatesDialog = ({
             </DialogTitle>
           </DialogHeader>
 
-          <div className="grid md:grid-cols-2 gap-6 h-[600px]">
+          <div className="grid md:grid-cols-2 gap-4 h-[500px] md:h-[600px]">
             {/* Template List */}
             <div className="space-y-4">
               <div>
@@ -147,7 +152,7 @@ export const TemplatesDialog = ({
                   <Sparkles className="h-4 w-4 text-gold" />
                   Pre-built Templates
                 </h3>
-                <ScrollArea className="h-[250px]">
+                <ScrollArea className="h-[180px] md:h-[250px]">
                   <div className="space-y-2 pr-4">
                     {prebuiltTemplates.map((template) => renderTemplateCard(template))}
                   </div>
@@ -157,7 +162,7 @@ export const TemplatesDialog = ({
               {customTemplates.length > 0 && (
                 <div>
                   <h3 className="text-sm font-semibold mb-3">My Templates</h3>
-                  <ScrollArea className="h-[250px]">
+                  <ScrollArea className="h-[180px] md:h-[250px]">
                     <div className="space-y-2 pr-4">
                       {customTemplates.map((template) => renderTemplateCard(template))}
                     </div>

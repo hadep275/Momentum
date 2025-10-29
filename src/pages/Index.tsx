@@ -4,6 +4,7 @@ import { TaskList } from "@/components/TaskList";
 import { Analytics } from "@/components/Analytics";
 import { AppSettings } from "@/components/AppSettings";
 import { InstallPWA } from "@/components/InstallPWA";
+import { SplashScreen } from "@/components/SplashScreen";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { ListTodo, CalendarDays, BarChart3, Settings } from "lucide-react";
@@ -17,7 +18,22 @@ const HABITS_STORAGE_KEY = "momentum-habits";
 const SETTINGS_STORAGE_KEY = "momentum-settings";
 
 const Index = () => {
+  const [showSplash, setShowSplash] = useState(() => {
+    // Only show splash on first visit or after 1 hour
+    const lastSplash = localStorage.getItem("momentum-last-splash");
+    if (!lastSplash) return true;
+    const oneHour = 60 * 60 * 1000;
+    return Date.now() - parseInt(lastSplash) > oneHour;
+  });
+
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+
+  useEffect(() => {
+    if (showSplash) {
+      localStorage.setItem("momentum-last-splash", Date.now().toString());
+      setTimeout(() => setShowSplash(false), 2000);
+    }
+  }, [showSplash]);
   const [hideCompletedHabits, setHideCompletedHabits] = useState(() => {
     const stored = localStorage.getItem(SETTINGS_STORAGE_KEY);
     if (stored) {
@@ -146,7 +162,9 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background pb-20">
+    <>
+      {showSplash && <SplashScreen />}
+      <div className="min-h-screen bg-background pb-20">
       <div className="container mx-auto py-8 px-4">
         <header className="mb-8 border-b-2 border-gold pb-6">
           <div className="flex items-start justify-between">
@@ -228,6 +246,7 @@ const Index = () => {
         <InstallPWA />
       </div>
     </div>
+    </>
   );
 };
 

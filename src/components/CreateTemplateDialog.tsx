@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { TemplateTask } from "@/types/template";
 import { TASK_CATEGORIES } from "@/types/task";
-import { Plus, Trash2, Clock } from "lucide-react";
+import { Plus, Trash2, Clock, ListChecks } from "lucide-react";
 import { TagInput } from "@/components/TagInput";
 
 interface CreateTemplateDialogProps {
@@ -89,7 +89,7 @@ export const CreateTemplateDialog = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-2xl max-h-[90vh] w-[95vw] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Create Template</DialogTitle>
         </DialogHeader>
@@ -158,7 +158,7 @@ export const CreateTemplateDialog = ({
                     rows={2}
                   />
 
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div className="space-y-2">
                       <Label className="text-xs">Start Time</Label>
                       <Input
@@ -188,7 +188,7 @@ export const CreateTemplateDialog = ({
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div className="space-y-2">
                       <Label className="text-xs">Priority</Label>
                       <Select
@@ -238,6 +238,57 @@ export const CreateTemplateDialog = ({
                       onTagsChange={(tags) => handleUpdateTask(index, { tags })}
                       existingTags={existingTags}
                     />
+                  </div>
+
+                  {/* Checklists/Subtasks */}
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <Label className="text-xs flex items-center gap-1">
+                        <ListChecks className="h-3 w-3" />
+                        Subtasks (optional)
+                      </Label>
+                      <Button
+                        type="button"
+                        size="sm"
+                        variant="ghost"
+                        className="h-6 text-xs"
+                        onClick={() => {
+                          const checklists = task.checklists || [];
+                          handleUpdateTask(index, {
+                            checklists: [...checklists, { title: "" }],
+                          });
+                        }}
+                      >
+                        <Plus className="h-3 w-3 mr-1" />
+                        Add
+                      </Button>
+                    </div>
+                    {task.checklists?.map((checklist, checklistIndex) => (
+                      <div key={checklistIndex} className="flex gap-2">
+                        <Input
+                          value={checklist.title}
+                          onChange={(e) => {
+                            const checklists = [...(task.checklists || [])];
+                            checklists[checklistIndex] = { ...checklist, title: e.target.value };
+                            handleUpdateTask(index, { checklists });
+                          }}
+                          placeholder="Subtask title"
+                          className="flex-1"
+                        />
+                        <Button
+                          type="button"
+                          size="sm"
+                          variant="ghost"
+                          className="h-10 w-10 p-0"
+                          onClick={() => {
+                            const checklists = task.checklists?.filter((_, i) => i !== checklistIndex);
+                            handleUpdateTask(index, { checklists });
+                          }}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    ))}
                   </div>
                 </div>
               </div>
