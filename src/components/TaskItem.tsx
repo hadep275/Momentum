@@ -10,7 +10,7 @@ import { ChecklistItem } from "@/components/ChecklistItem";
 import { CategoryBadge } from "@/components/CategoryBadge";
 import { TagBadge } from "@/components/TagBadge";
 import { EditTaskDialog } from "@/components/EditTaskDialog";
-import { formatDistanceToNow, isPast, differenceInDays, format } from "date-fns";
+import { formatDistanceToNow, isPast, differenceInDays, format, addDays, addWeeks, addMonths } from "date-fns";
 
 interface TaskItemProps {
   task: Task;
@@ -38,8 +38,51 @@ export const TaskItem = ({ task, onUpdate, onDelete, existingTags = [] }: TaskIt
     return `${secs}s`;
   };
 
+  const calculateNextDueDate = (currentDueDate: Date, recurrence: Task["recurrence"]): Date => {
+    if (!recurrence) return currentDueDate;
+    
+    switch (recurrence.type) {
+      case "daily":
+        return addDays(currentDueDate, recurrence.interval || 1);
+      case "weekly":
+        return addWeeks(currentDueDate, recurrence.interval || 1);
+      case "monthly":
+        return addMonths(currentDueDate, recurrence.interval || 1);
+      case "custom":
+        return addDays(currentDueDate, recurrence.interval || 1);
+      default:
+        return currentDueDate;
+    }
+  };
+
   const handleToggleComplete = () => {
-    onUpdate({ ...task, completed: !task.completed });
+    const isCompleting = !task.completed;
+    
+    // If completing a recurring task, create a new instance
+    if (isCompleting && task.recurrence) {
+      const nextDueDate = calculateNextDueDate(new Date(task.dueDate), task.recurrence);
+      
+      const newRecurringTask: Task = {
+        ...task,
+        id: crypto.randomUUID(),
+        dueDate: nextDueDate,
+        completed: false,
+        createdAt: new Date(),
+        checklists: task.checklists.map(c => ({
+          ...c,
+          completed: false,
+          timeSpent: 0
+        }))
+      };
+      
+      // Update current task as completed
+      onUpdate({ ...task, completed: true });
+      
+      // Create new recurring task
+      onUpdate(newRecurringTask);
+    } else {
+      onUpdate({ ...task, completed: !task.completed });
+    }
   };
 
   const handleUpdateChecklist = (checklistId: string, updates: Partial<Task["checklists"][0]>) => {

@@ -206,15 +206,18 @@ export const EditTaskDialog = ({
           <div className="space-y-2">
             <Label htmlFor="recurrence">Recurrence</Label>
             <Select
-              value={recurrenceType?.type}
+              value={recurrenceType?.type || "none"}
               onValueChange={(value) =>
-                setRecurrenceType({ type: value as Task["recurrence"]["type"] })
+                value === "none" 
+                  ? setRecurrenceType(undefined)
+                  : setRecurrenceType({ type: value as Task["recurrence"]["type"] })
               }
             >
               <SelectTrigger id="recurrence">
                 <SelectValue placeholder="Select recurrence" />
               </SelectTrigger>
               <SelectContent>
+                <SelectItem value="none">None</SelectItem>
                 <SelectItem value="daily">Daily</SelectItem>
                 <SelectItem value="weekly">Weekly</SelectItem>
                 <SelectItem value="monthly">Monthly</SelectItem>
