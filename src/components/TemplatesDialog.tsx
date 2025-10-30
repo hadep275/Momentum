@@ -133,7 +133,7 @@ export const TemplatesDialog = ({
   return (
     <>
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="max-w-4xl max-h-[90vh] w-[95vw]">
+        <DialogContent className="max-w-4xl max-h-[90vh] w-[95vw] flex flex-col">
           <DialogHeader>
             <DialogTitle className="flex flex-col sm:flex-row items-start sm:items-center gap-2">
               <span>Task Templates</span>
@@ -144,7 +144,8 @@ export const TemplatesDialog = ({
             </DialogTitle>
           </DialogHeader>
 
-          <div className="grid md:grid-cols-2 gap-4 h-[500px] md:h-[600px]">
+          <ScrollArea className="flex-1">
+            <div className="grid md:grid-cols-2 gap-4 pr-4">
             {/* Template List */}
             <div className="space-y-4">
               <div>
@@ -172,9 +173,9 @@ export const TemplatesDialog = ({
             </div>
 
             {/* Template Preview */}
-            <div className="border rounded-lg overflow-hidden flex flex-col">
+            <div className="border rounded-lg overflow-hidden">
               {selectedTemplate ? (
-                <div className="h-full flex flex-col">
+                <div className="flex flex-col">
                   <div className="p-4 border-b">
                     <h3 className="text-lg font-semibold mb-1">{selectedTemplate.name}</h3>
                     {selectedTemplate.description && (
@@ -182,44 +183,42 @@ export const TemplatesDialog = ({
                     )}
                   </div>
 
-                  <ScrollArea className="flex-1 p-4">
-                    <div className="space-y-3">
-                      {selectedTemplate.tasks.map((task, index) => (
-                        <div key={index} className="border rounded-lg p-3 space-y-2">
-                          <div className="flex items-start justify-between gap-2">
-                            <div className="flex-1 min-w-0">
-                              <div className="font-medium break-words">{task.title}</div>
-                              {task.description && (
-                                <div className="text-sm text-muted-foreground mt-1 break-words">{task.description}</div>
-                              )}
-                            </div>
-                            <div className="flex items-center gap-1 text-xs text-muted-foreground shrink-0">
-                              <Clock className="h-3 w-3" />
-                              {formatRelativeTime(task.relativeMinutes)}
-                            </div>
-                          </div>
-
-                          <div className="flex flex-wrap gap-2 items-center">
-                            {task.categoryId && <CategoryBadge categoryId={task.categoryId} />}
-                            {task.tags.map((tag) => (
-                              <TagBadge key={tag} tag={tag} />
-                            ))}
-                            {task.durationMinutes && (
-                              <span className="text-xs text-muted-foreground">
-                                ~{task.durationMinutes}min
-                              </span>
+                  <div className="p-4 space-y-3">
+                    {selectedTemplate.tasks.map((task, index) => (
+                      <div key={index} className="border rounded-lg p-3 space-y-2">
+                        <div className="flex items-start justify-between gap-2">
+                          <div className="flex-1 min-w-0">
+                            <div className="font-medium break-words">{task.title}</div>
+                            {task.description && (
+                              <div className="text-sm text-muted-foreground mt-1 break-words">{task.description}</div>
                             )}
                           </div>
+                          <div className="flex items-center gap-1 text-xs text-muted-foreground shrink-0">
+                            <Clock className="h-3 w-3" />
+                            {formatRelativeTime(task.relativeMinutes)}
+                          </div>
+                        </div>
 
-                          {task.checklists && task.checklists.length > 0 && (
-                            <div className="text-xs text-muted-foreground pl-2 border-l-2 border-muted">
-                              {task.checklists.length} subtask{task.checklists.length !== 1 ? 's' : ''}
-                            </div>
+                        <div className="flex flex-wrap gap-2 items-center">
+                          {task.categoryId && <CategoryBadge categoryId={task.categoryId} />}
+                          {task.tags.map((tag) => (
+                            <TagBadge key={tag} tag={tag} />
+                          ))}
+                          {task.durationMinutes && (
+                            <span className="text-xs text-muted-foreground">
+                              ~{task.durationMinutes}min
+                            </span>
                           )}
                         </div>
-                      ))}
-                    </div>
-                  </ScrollArea>
+
+                        {task.checklists && task.checklists.length > 0 && (
+                          <div className="text-xs text-muted-foreground pl-2 border-l-2 border-muted">
+                            {task.checklists.length} subtask{task.checklists.length !== 1 ? 's' : ''}
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
 
                   <div className="p-4 border-t">
                     <Button onClick={() => handleUseTemplate(selectedTemplate)} className="w-full">
@@ -229,12 +228,13 @@ export const TemplatesDialog = ({
                   </div>
                 </div>
               ) : (
-                <div className="h-full flex items-center justify-center p-4 text-center text-muted-foreground">
+                <div className="h-64 flex items-center justify-center p-4 text-center text-muted-foreground">
                   Select a template to preview
                 </div>
               )}
             </div>
           </div>
+          </ScrollArea>
         </DialogContent>
       </Dialog>
 
