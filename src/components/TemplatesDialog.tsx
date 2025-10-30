@@ -144,7 +144,7 @@ export const TemplatesDialog = ({
             </DialogTitle>
           </DialogHeader>
 
-          <ScrollArea className="flex-1 min-h-0">
+          <div className="flex-1 min-h-0 overflow-y-auto">
             <div className="grid md:grid-cols-2 gap-4 pr-4 pb-4">
             {/* Template List */}
             <div className="space-y-4">
@@ -234,7 +234,7 @@ export const TemplatesDialog = ({
               )}
             </div>
           </div>
-          </ScrollArea>
+        </div>
         </DialogContent>
       </Dialog>
 
