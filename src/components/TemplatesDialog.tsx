@@ -133,8 +133,8 @@ export const TemplatesDialog = ({
   return (
     <>
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="max-w-4xl max-h-[90vh] w-[95vw] flex flex-col">
-          <DialogHeader>
+        <DialogContent className="max-w-4xl w-[95vw] flex flex-col max-h-[90vh]">
+          <DialogHeader className="flex-shrink-0">
             <DialogTitle className="flex flex-col sm:flex-row items-start sm:items-center gap-2">
               <span>Task Templates</span>
               <Button onClick={() => setIsCreateDialogOpen(true)} size="sm" variant="outline">
@@ -144,8 +144,8 @@ export const TemplatesDialog = ({
             </DialogTitle>
           </DialogHeader>
 
-          <ScrollArea className="flex-1">
-            <div className="grid md:grid-cols-2 gap-4 pr-4">
+          <ScrollArea className="flex-1 min-h-0">
+            <div className="grid md:grid-cols-2 gap-4 pr-4 pb-4">
             {/* Template List */}
             <div className="space-y-4">
               <div>
