@@ -9,12 +9,15 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { ListTodo, CalendarDays, BarChart3, Settings } from "lucide-react";
 import { Task, Habit } from "@/types/task";
+import { ToDo } from "@/types/todo";
+import { ToDoList } from "@/components/ToDoList";
 import { useNotificationScheduler } from "@/hooks/useNotificationScheduler";
 import { toast } from "sonner";
 import momentumLogo from "@/assets/momentum-logo.png";
 
 const TASKS_STORAGE_KEY = "momentum-tasks";
 const HABITS_STORAGE_KEY = "momentum-habits";
+const TODOS_STORAGE_KEY = "momentum-todos";
 const SETTINGS_STORAGE_KEY = "momentum-settings";
 
 const Index = () => {
@@ -104,6 +107,24 @@ const Index = () => {
     return [];
   });
 
+  const [todos, setTodos] = useState<ToDo[]>(() => {
+    // Load todos from localStorage on initial render
+    const stored = localStorage.getItem(TODOS_STORAGE_KEY);
+    if (stored) {
+      try {
+        const parsed = JSON.parse(stored);
+        return parsed.map((todo: any) => ({
+          ...todo,
+          createdAt: new Date(todo.createdAt),
+        }));
+      } catch (e) {
+        console.error("Failed to parse stored todos:", e);
+        return [];
+      }
+    }
+    return [];
+  });
+
   // Save tasks to localStorage whenever they change
   useEffect(() => {
     localStorage.setItem(TASKS_STORAGE_KEY, JSON.stringify(tasks));
@@ -113,6 +134,11 @@ const Index = () => {
   useEffect(() => {
     localStorage.setItem(HABITS_STORAGE_KEY, JSON.stringify(habits));
   }, [habits]);
+
+  // Save todos to localStorage whenever they change
+  useEffect(() => {
+    localStorage.setItem(TODOS_STORAGE_KEY, JSON.stringify(todos));
+  }, [todos]);
 
   // Save settings to localStorage whenever they change
   useEffect(() => {
@@ -140,15 +166,66 @@ const Index = () => {
   // Initialize notification scheduler
   useNotificationScheduler(tasks, habits);
 
+  const handleAddToDo = (title: string) => {
+    const newToDo: ToDo = {
+      id: crypto.randomUUID(),
+      title,
+      completed: false,
+      createdAt: new Date(),
+      timeSpent: 0,
+      isTimerRunning: false,
+    };
+    setTodos([...todos, newToDo]);
+    toast.success("To-do added!");
+  };
+
+  const handleToggleToDo = (id: string) => {
+    setTodos(todos.map(todo =>
+      todo.id === id ? { ...todo, completed: !todo.completed } : todo
+    ));
+  };
+
+  const handleDeleteToDo = (id: string) => {
+    setTodos(todos.filter(todo => todo.id !== id));
+    toast.success("To-do deleted");
+  };
+
+  const handleUpdateToDoTimeSpent = (id: string, timeSpent: number) => {
+    setTodos(todos.map(todo =>
+      todo.id === id ? { ...todo, timeSpent } : todo
+    ));
+  };
+
+  const handleToggleToDoTimer = (id: string) => {
+    setTodos(todos.map(todo => {
+      if (todo.id === id) {
+        return { ...todo, isTimerRunning: !todo.isTimerRunning };
+      }
+      // Stop other timers
+      return { ...todo, isTimerRunning: false };
+    }));
+  };
+
+  const handleConvertToDoToTask = (task: Omit<Task, "id" | "createdAt">) => {
+    const newTask: Task = {
+      ...task,
+      id: crypto.randomUUID(),
+      createdAt: new Date(),
+    };
+    setTasks([...tasks, newTask]);
+  };
+
   const handleResetData = () => {
     // Clear localStorage
     localStorage.removeItem(TASKS_STORAGE_KEY);
     localStorage.removeItem(HABITS_STORAGE_KEY);
+    localStorage.removeItem(TODOS_STORAGE_KEY);
     localStorage.removeItem(SETTINGS_STORAGE_KEY);
     
     // Reset state
     setTasks([]);
     setHabits([]);
+    setTodos([]);
     setHideCompletedHabits(false);
     setHideCompletedTasks(false);
     
@@ -201,6 +278,17 @@ const Index = () => {
               onUpdateHabits={setHabits}
               hideCompletedHabits={hideCompletedHabits}
               hideCompletedTasks={hideCompletedTasks}
+            />
+            
+            <ToDoList
+              todos={todos}
+              onAddToDo={handleAddToDo}
+              onToggleToDo={handleToggleToDo}
+              onDeleteToDo={handleDeleteToDo}
+              onUpdateTimeSpent={handleUpdateToDoTimeSpent}
+              onToggleTimer={handleToggleToDoTimer}
+              onConvertToTask={handleConvertToDoToTask}
+              existingTags={tasks.flatMap((task) => task.tags)}
             />
           </TabsContent>
 
