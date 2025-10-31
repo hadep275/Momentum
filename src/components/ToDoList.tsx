@@ -3,11 +3,25 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Plus } from "lucide-react";
-import { ToDoItem } from "@/components/ToDoItem";
+import { SortableToDoItem } from "@/components/SortableToDoItem";
 import { ToDo } from "@/types/todo";
-import { Task, TaskPriority } from "@/types/task";
+import { Task } from "@/types/task";
 import { toast } from "sonner";
 import { CreateTaskDialog } from "@/components/CreateTaskDialog";
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from "@dnd-kit/core";
+import {
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
 
 interface ToDoListProps {
   todos: ToDo[];
@@ -17,7 +31,9 @@ interface ToDoListProps {
   onUpdateTimeSpent: (id: string, timeSpent: number) => void;
   onToggleTimer: (id: string) => void;
   onConvertToTask: (task: Omit<Task, "id" | "createdAt">) => void;
+  onUpdateToDos: (todos: ToDo[]) => void;
   existingTags?: string[];
+  searchQuery?: string;
 }
 
 export const ToDoList = ({
@@ -28,10 +44,19 @@ export const ToDoList = ({
   onUpdateTimeSpent,
   onToggleTimer,
   onConvertToTask,
+  onUpdateToDos,
   existingTags = [],
+  searchQuery = "",
 }: ToDoListProps) => {
   const [newToDoTitle, setNewToDoTitle] = useState("");
   const [todoToConvert, setTodoToConvert] = useState<ToDo | null>(null);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
 
   const handleAddToDo = () => {
     if (newToDoTitle.trim()) {
@@ -53,8 +78,46 @@ export const ToDoList = ({
     toast.success("Converted to scheduled task!");
   };
 
-  const activeTodos = todos.filter(todo => !todo.completed);
-  const completedTodos = todos.filter(todo => todo.completed);
+  const handleDragEndActive = (event: DragEndEvent) => {
+    const { active, over } = event;
+
+    if (over && active.id !== over.id) {
+      const oldIndex = activeTodos.findIndex((todo) => todo.id === active.id);
+      const newIndex = activeTodos.findIndex((todo) => todo.id === over.id);
+
+      const newActiveTodos = [...activeTodos];
+      const [removed] = newActiveTodos.splice(oldIndex, 1);
+      newActiveTodos.splice(newIndex, 0, removed);
+
+      onUpdateToDos([...newActiveTodos, ...completedTodos]);
+    }
+  };
+
+  const handleDragEndCompleted = (event: DragEndEvent) => {
+    const { active, over } = event;
+
+    if (over && active.id !== over.id) {
+      const oldIndex = completedTodos.findIndex((todo) => todo.id === active.id);
+      const newIndex = completedTodos.findIndex((todo) => todo.id === over.id);
+
+      const newCompletedTodos = [...completedTodos];
+      const [removed] = newCompletedTodos.splice(oldIndex, 1);
+      newCompletedTodos.splice(newIndex, 0, removed);
+
+      onUpdateToDos([...activeTodos, ...newCompletedTodos]);
+    }
+  };
+
+  // Filter todos by search query
+  const filteredTodos = searchQuery.trim()
+    ? todos.filter((todo) => {
+        const query = searchQuery.toLowerCase();
+        return todo.title.toLowerCase().includes(query);
+      })
+    : todos;
+
+  const activeTodos = filteredTodos.filter(todo => !todo.completed);
+  const completedTodos = filteredTodos.filter(todo => todo.completed);
 
   return (
     <>
@@ -88,19 +151,30 @@ export const ToDoList = ({
 
         {/* Active To-Dos */}
         {activeTodos.length > 0 && (
-          <div className="space-y-2">
-            {activeTodos.map((todo) => (
-              <ToDoItem
-                key={todo.id}
-                todo={todo}
-                onToggle={onToggleToDo}
-                onDelete={onDeleteToDo}
-                onConvertToTask={handleConvertToTask}
-                onUpdateTimeSpent={onUpdateTimeSpent}
-                onToggleTimer={onToggleTimer}
-              />
-            ))}
-          </div>
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragEnd={handleDragEndActive}
+          >
+            <SortableContext
+              items={activeTodos.map((todo) => todo.id)}
+              strategy={verticalListSortingStrategy}
+            >
+              <div className="space-y-2">
+                {activeTodos.map((todo) => (
+                  <SortableToDoItem
+                    key={todo.id}
+                    todo={todo}
+                    onToggle={onToggleToDo}
+                    onDelete={onDeleteToDo}
+                    onConvertToTask={handleConvertToTask}
+                    onUpdateTimeSpent={onUpdateTimeSpent}
+                    onToggleTimer={onToggleTimer}
+                  />
+                ))}
+              </div>
+            </SortableContext>
+          </DndContext>
         )}
 
         {/* Completed To-Dos */}
@@ -109,25 +183,38 @@ export const ToDoList = ({
             <summary className="cursor-pointer text-sm text-muted-foreground hover:text-foreground">
               Completed ({completedTodos.length})
             </summary>
-            <div className="space-y-2 mt-2">
-              {completedTodos.map((todo) => (
-                <ToDoItem
-                  key={todo.id}
-                  todo={todo}
-                  onToggle={onToggleToDo}
-                  onDelete={onDeleteToDo}
-                  onConvertToTask={handleConvertToTask}
-                  onUpdateTimeSpent={onUpdateTimeSpent}
-                  onToggleTimer={onToggleTimer}
-                />
-              ))}
-            </div>
+            <DndContext
+              sensors={sensors}
+              collisionDetection={closestCenter}
+              onDragEnd={handleDragEndCompleted}
+            >
+              <SortableContext
+                items={completedTodos.map((todo) => todo.id)}
+                strategy={verticalListSortingStrategy}
+              >
+                <div className="space-y-2 mt-2">
+                  {completedTodos.map((todo) => (
+                    <SortableToDoItem
+                      key={todo.id}
+                      todo={todo}
+                      onToggle={onToggleToDo}
+                      onDelete={onDeleteToDo}
+                      onConvertToTask={handleConvertToTask}
+                      onUpdateTimeSpent={onUpdateTimeSpent}
+                      onToggleTimer={onToggleTimer}
+                    />
+                  ))}
+                </div>
+              </SortableContext>
+            </DndContext>
           </details>
         )}
 
         {activeTodos.length === 0 && completedTodos.length === 0 && (
           <p className="text-center text-muted-foreground py-8">
-            No to-dos yet. Add one above to get started!
+            {searchQuery.trim()
+              ? "No to-dos found matching your search."
+              : "No to-dos yet. Add one above to get started!"}
           </p>
         )}
       </Card>

@@ -30,6 +30,7 @@ const Index = () => {
   });
 
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
     if (showSplash) {
@@ -278,6 +279,8 @@ const Index = () => {
               onUpdateHabits={setHabits}
               hideCompletedHabits={hideCompletedHabits}
               hideCompletedTasks={hideCompletedTasks}
+              searchQuery={searchQuery}
+              onSearchQueryChange={setSearchQuery}
             />
             
             <ToDoList
@@ -288,7 +291,9 @@ const Index = () => {
               onUpdateTimeSpent={handleUpdateToDoTimeSpent}
               onToggleTimer={handleToggleToDoTimer}
               onConvertToTask={handleConvertToDoToTask}
+              onUpdateToDos={setTodos}
               existingTags={tasks.flatMap((task) => task.tags)}
+              searchQuery={searchQuery}
             />
           </TabsContent>
 

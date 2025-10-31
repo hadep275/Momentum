@@ -9,7 +9,7 @@ interface SearchBarProps {
   placeholder?: string;
 }
 
-export const SearchBar = ({ value, onChange, placeholder = "Search tasks and habits..." }: SearchBarProps) => {
+export const SearchBar = ({ value, onChange, placeholder = "Search tasks, habits, and to-dos..." }: SearchBarProps) => {
   return (
     <div className="relative">
       <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
