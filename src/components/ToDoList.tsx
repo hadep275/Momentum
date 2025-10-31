@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Plus, ListTodo } from "lucide-react";
+import { Plus } from "lucide-react";
 import { ToDoItem } from "@/components/ToDoItem";
 import { ToDo } from "@/types/todo";
 import { Task, TaskPriority } from "@/types/task";
@@ -58,14 +58,16 @@ export const ToDoList = ({
 
   return (
     <>
-      <Card className="p-6 space-y-4">
+      <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
-          <ListTodo className="h-5 w-5 text-gold" />
           <h2 className="text-xl font-semibold">To-Dos</h2>
           <span className="text-sm text-muted-foreground">
             ({activeTodos.length} active)
           </span>
         </div>
+      </div>
+      
+      <Card className="p-6 space-y-4">
 
         {/* Quick Add */}
         <div className="flex gap-2">
@@ -136,6 +138,7 @@ export const ToDoList = ({
           onOpenChange={(open) => !open && setTodoToConvert(null)}
           onCreateTask={handleCreateTaskFromToDo}
           existingTags={existingTags}
+          initialTitle={todoToConvert.title}
         />
       )}
     </>

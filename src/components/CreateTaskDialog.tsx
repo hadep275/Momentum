@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Dialog,
   DialogContent,
@@ -26,15 +26,17 @@ interface CreateTaskDialogProps {
   onOpenChange: (open: boolean) => void;
   onCreateTask: (task: Omit<Task, "id" | "createdAt">) => void;
   existingTags?: string[];
+  initialTitle?: string;
 }
 
 export const CreateTaskDialog = ({ 
   open, 
   onOpenChange, 
   onCreateTask,
-  existingTags = []
+  existingTags = [],
+  initialTitle = ""
 }: CreateTaskDialogProps) => {
-  const [title, setTitle] = useState("");
+  const [title, setTitle] = useState(initialTitle);
   const [description, setDescription] = useState("");
   const [dueDate, setDueDate] = useState<Date | undefined>(new Date()); // Default to today
   const [dueTime, setDueTime] = useState<string>("");
@@ -45,6 +47,13 @@ export const CreateTaskDialog = ({
   const [checklists, setChecklists] = useState<string[]>([]);
   const [newChecklistItem, setNewChecklistItem] = useState("");
   const [reminderMinutes, setReminderMinutes] = useState<number | undefined>(undefined);
+
+  // Update title when dialog opens with initialTitle
+  useEffect(() => {
+    if (open && initialTitle) {
+      setTitle(initialTitle);
+    }
+  }, [open, initialTitle]);
 
   const handleAddChecklistItem = () => {
     if (newChecklistItem.trim()) {
