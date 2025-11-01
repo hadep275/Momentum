@@ -3,8 +3,8 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Plus, CheckSquare, ListTodo, Layers } from "lucide-react";
 import { SearchBar } from "@/components/SearchBar";
-import { SortableTaskItem } from "@/components/SortableTaskItem";
-import { SortableHabitItem } from "@/components/SortableHabitItem";
+import { TaskItem } from "@/components/TaskItem";
+import { HabitItem } from "@/components/HabitItem";
 import { CreateTaskDialog } from "@/components/CreateTaskDialog";
 import { CreateHabitDialog } from "@/components/CreateHabitDialog";
 import { EditHabitDialog } from "@/components/EditHabitDialog";
@@ -12,20 +12,6 @@ import { TemplatesDialog } from "@/components/TemplatesDialog";
 import { CategoryFilter } from "@/components/CategoryFilter";
 import { Task, Habit } from "@/types/task";
 import { isSameDay, format } from "date-fns";
-import {
-  DndContext,
-  closestCenter,
-  KeyboardSensor,
-  PointerSensor,
-  useSensor,
-  useSensors,
-  DragEndEvent,
-} from "@dnd-kit/core";
-import {
-  SortableContext,
-  sortableKeyboardCoordinates,
-  verticalListSortingStrategy,
-} from "@dnd-kit/sortable";
 import {
   Dialog,
   DialogContent,
@@ -51,13 +37,6 @@ export const TaskList = ({ tasks, onUpdateTasks, habits, onUpdateHabits, hideCom
   const [isTemplatesDialogOpen, setIsTemplatesDialogOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [editingHabit, setEditingHabit] = useState<Habit | null>(null);
-
-  const sensors = useSensors(
-    useSensor(PointerSensor),
-    useSensor(KeyboardSensor, {
-      coordinateGetter: sortableKeyboardCoordinates,
-    })
-  );
 
   // Get all unique tags from tasks for autocomplete
   const allTags = Array.from(new Set(tasks.flatMap((task) => task.tags)));
@@ -129,42 +108,6 @@ export const TaskList = ({ tasks, onUpdateTasks, habits, onUpdateHabits, hideCom
   const openNewHabitDialog = () => {
     setIsNewItemSheetOpen(false);
     setIsCreateHabitDialogOpen(true);
-  };
-
-  const handleDragEndTasks = (event: DragEndEvent) => {
-    const { active, over } = event;
-
-    if (over && active.id !== over.id) {
-      const oldIndex = sortedTasks.findIndex((task) => task.id === active.id);
-      const newIndex = sortedTasks.findIndex((task) => task.id === over.id);
-
-      const newTasks = [...sortedTasks];
-      const [removed] = newTasks.splice(oldIndex, 1);
-      newTasks.splice(newIndex, 0, removed);
-
-      // Update all tasks, preserving non-sorted ones
-      const sortedIds = new Set(sortedTasks.map(t => t.id));
-      const otherTasks = tasks.filter(t => !sortedIds.has(t.id));
-      onUpdateTasks([...newTasks, ...otherTasks]);
-    }
-  };
-
-  const handleDragEndHabits = (event: DragEndEvent) => {
-    const { active, over } = event;
-
-    if (over && active.id !== over.id) {
-      const oldIndex = searchFilteredHabits.findIndex(({ habit }) => habit.id === active.id);
-      const newIndex = searchFilteredHabits.findIndex(({ habit }) => habit.id === over.id);
-
-      const newHabits = [...searchFilteredHabits.map(h => h.habit)];
-      const [removed] = newHabits.splice(oldIndex, 1);
-      newHabits.splice(newIndex, 0, removed);
-
-      // Update all habits, preserving non-sorted ones
-      const sortedIds = new Set(searchFilteredHabits.map(h => h.habit.id));
-      const otherHabits = habits.filter(h => !sortedIds.has(h.id));
-      onUpdateHabits([...newHabits, ...otherHabits]);
-    }
   };
 
   // Filter tasks: only show today's tasks
@@ -308,28 +251,17 @@ export const TaskList = ({ tasks, onUpdateTasks, habits, onUpdateHabits, hideCom
             </p>
           </Card>
         ) : (
-          <DndContext
-            sensors={sensors}
-            collisionDetection={closestCenter}
-            onDragEnd={handleDragEndTasks}
-          >
-            <SortableContext
-              items={sortedTasks.map((task) => task.id)}
-              strategy={verticalListSortingStrategy}
-            >
-              <div className="space-y-3">
-                {sortedTasks.map((task) => (
-                  <SortableTaskItem
-                    key={task.id}
-                    task={task}
-                    onUpdate={handleUpdateTask}
-                    onDelete={handleDeleteTask}
-                    existingTags={allTags}
-                  />
-                ))}
-              </div>
-            </SortableContext>
-          </DndContext>
+          <div className="space-y-3">
+            {sortedTasks.map((task) => (
+              <TaskItem
+                key={task.id}
+                task={task}
+                onUpdate={handleUpdateTask}
+                onDelete={handleDeleteTask}
+                existingTags={allTags}
+              />
+            ))}
+          </div>
         )}
       </div>
 
@@ -349,29 +281,18 @@ export const TaskList = ({ tasks, onUpdateTasks, habits, onUpdateHabits, hideCom
             </p>
           </Card>
         ) : (
-          <DndContext
-            sensors={sensors}
-            collisionDetection={closestCenter}
-            onDragEnd={handleDragEndHabits}
-          >
-            <SortableContext
-              items={searchFilteredHabits.map(({ habit }) => habit.id)}
-              strategy={verticalListSortingStrategy}
-            >
-              <div className="space-y-3">
-                {searchFilteredHabits.map(({ habit, isCompletedToday }) => (
-                  <SortableHabitItem
-                    key={habit.id}
-                    habit={habit}
-                    isCompletedToday={isCompletedToday}
-                    onToggleComplete={handleToggleHabitComplete}
-                    onEdit={setEditingHabit}
-                    onDelete={handleDeleteHabit}
-                  />
-                ))}
-              </div>
-            </SortableContext>
-          </DndContext>
+          <div className="space-y-3">
+            {searchFilteredHabits.map(({ habit, isCompletedToday }) => (
+              <HabitItem
+                key={habit.id}
+                habit={habit}
+                isCompletedToday={isCompletedToday}
+                onToggleComplete={handleToggleHabitComplete}
+                onEdit={setEditingHabit}
+                onDelete={handleDeleteHabit}
+              />
+            ))}
+          </div>
         )}
       </div>
 
