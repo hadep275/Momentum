@@ -7,9 +7,11 @@ import { InstallPWA } from "@/components/InstallPWA";
 import { SplashScreen } from "@/components/SplashScreen";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
-import { ListTodo, CalendarDays, BarChart3, Settings } from "lucide-react";
+import { ListTodo, CalendarDays, BarChart3, Settings, StickyNote } from "lucide-react";
 import { Task, Habit } from "@/types/task";
 import { ToDo } from "@/types/todo";
+import { Note } from "@/types/note";
+import { NotesList } from "@/components/NotesList";
 import { ToDoList } from "@/components/ToDoList";
 import { useNotificationScheduler } from "@/hooks/useNotificationScheduler";
 import { toast } from "sonner";
@@ -19,6 +21,7 @@ const TASKS_STORAGE_KEY = "momentum-tasks";
 const HABITS_STORAGE_KEY = "momentum-habits";
 const TODOS_STORAGE_KEY = "momentum-todos";
 const SETTINGS_STORAGE_KEY = "momentum-settings";
+const NOTES_STORAGE_KEY = "momentum-notes";
 
 const Index = () => {
   const [showSplash, setShowSplash] = useState(() => {
@@ -126,6 +129,19 @@ const Index = () => {
     return [];
   });
 
+  const [notes, setNotes] = useState<Note[]>(() => {
+    const stored = localStorage.getItem(NOTES_STORAGE_KEY);
+    if (stored) {
+      try {
+        return JSON.parse(stored);
+      } catch (e) {
+        console.error("Failed to parse stored notes:", e);
+        return [];
+      }
+    }
+    return [];
+  });
+
   // Save tasks to localStorage whenever they change
   useEffect(() => {
     localStorage.setItem(TASKS_STORAGE_KEY, JSON.stringify(tasks));
@@ -140,6 +156,11 @@ const Index = () => {
   useEffect(() => {
     localStorage.setItem(TODOS_STORAGE_KEY, JSON.stringify(todos));
   }, [todos]);
+
+  // Save notes to localStorage whenever they change
+  useEffect(() => {
+    localStorage.setItem(NOTES_STORAGE_KEY, JSON.stringify(notes));
+  }, [notes]);
 
   // Save settings to localStorage whenever they change
   useEffect(() => {
@@ -216,17 +237,42 @@ const Index = () => {
     setTasks([...tasks, newTask]);
   };
 
+  const handleAddNote = () => {
+    const newNote: Note = {
+      id: crypto.randomUUID(),
+      title: "New Note",
+      content: "",
+      isPinned: false,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+    setNotes([newNote, ...notes]);
+  };
+
+  const handleUpdateNote = (id: string, updates: Partial<Note>) => {
+    setNotes(notes.map(note =>
+      note.id === id ? { ...note, ...updates } : note
+    ));
+  };
+
+  const handleDeleteNote = (id: string) => {
+    setNotes(notes.filter(note => note.id !== id));
+    toast.success("Note deleted");
+  };
+
   const handleResetData = () => {
     // Clear localStorage
     localStorage.removeItem(TASKS_STORAGE_KEY);
     localStorage.removeItem(HABITS_STORAGE_KEY);
     localStorage.removeItem(TODOS_STORAGE_KEY);
     localStorage.removeItem(SETTINGS_STORAGE_KEY);
+    localStorage.removeItem(NOTES_STORAGE_KEY);
     
     // Reset state
     setTasks([]);
     setHabits([]);
     setTodos([]);
+    setNotes([]);
     setHideCompletedHabits(false);
     setHideCompletedTasks(false);
     
@@ -310,13 +356,25 @@ const Index = () => {
             <Analytics tasks={tasks} habits={habits} />
           </TabsContent>
 
+          <TabsContent value="notes" className="space-y-4">
+            <NotesList
+              notes={notes}
+              onAddNote={handleAddNote}
+              onUpdateNote={handleUpdateNote}
+              onDeleteNote={handleDeleteNote}
+            />
+          </TabsContent>
+
           {/* Fixed Bottom Navigation */}
-          <TabsList className="fixed bottom-0 left-0 right-0 grid grid-cols-3 h-16 rounded-none border-t bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
+          <TabsList className="fixed bottom-0 left-0 right-0 grid grid-cols-4 h-16 rounded-none border-t bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
             <TabsTrigger value="tasks" className="h-full">
               <ListTodo className="h-6 w-6" />
             </TabsTrigger>
             <TabsTrigger value="calendar" className="h-full">
               <CalendarDays className="h-6 w-6" />
+            </TabsTrigger>
+            <TabsTrigger value="notes" className="h-full">
+              <StickyNote className="h-6 w-6" />
             </TabsTrigger>
             <TabsTrigger value="analytics" className="h-full">
               <BarChart3 className="h-6 w-6" />
