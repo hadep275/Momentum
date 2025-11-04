@@ -13,6 +13,8 @@ export const VoiceTextarea = ({ value, onChange, ...props }: VoiceTextareaProps)
   const [isListening, setIsListening] = useState(false);
   const recognitionRef = useRef<any>(null);
   const baseTextRef = useRef("");
+  const shouldStopRef = useRef(false);
+  const processedIndexRef = useRef(0);
   const { toast } = useToast();
 
   const startListening = () => {
@@ -25,6 +27,8 @@ export const VoiceTextarea = ({ value, onChange, ...props }: VoiceTextareaProps)
       return;
     }
 
+    shouldStopRef.current = false;
+    processedIndexRef.current = 0;
     baseTextRef.current = value;
     const SpeechRecognition = (window as any).webkitSpeechRecognition || (window as any).SpeechRecognition;
     const recognition = new SpeechRecognition();
@@ -35,20 +39,23 @@ export const VoiceTextarea = ({ value, onChange, ...props }: VoiceTextareaProps)
 
     recognition.onstart = () => {
       setIsListening(true);
+      processedIndexRef.current = 0;
     };
 
     recognition.onresult = (event: any) => {
-      let finalTranscript = "";
-
-      for (let i = event.resultIndex; i < event.results.length; i++) {
-        const transcript = event.results[i][0].transcript;
-        if (event.results[i].isFinal) {
-          finalTranscript += transcript + " ";
+      let appended = "";
+      for (let i = processedIndexRef.current; i < event.results.length; i++) {
+        const res = event.results[i];
+        if (res.isFinal) {
+          appended += res[0].transcript + " ";
+          processedIndexRef.current = i + 1;
+        } else {
+          break;
         }
       }
 
-      if (finalTranscript) {
-        baseTextRef.current = baseTextRef.current + finalTranscript;
+      if (appended) {
+        baseTextRef.current = baseTextRef.current + appended;
         const syntheticEvent = {
           target: { value: baseTextRef.current },
         } as React.ChangeEvent<HTMLTextAreaElement>;
@@ -58,6 +65,22 @@ export const VoiceTextarea = ({ value, onChange, ...props }: VoiceTextareaProps)
 
     recognition.onerror = (event: any) => {
       console.error("Speech recognition error", event);
+      if (!shouldStopRef.current && (event.error === "no-speech" || event.error === "aborted")) {
+        try {
+          recognition.stop();
+        } catch {}
+        setTimeout(() => {
+          if (!shouldStopRef.current) {
+            try {
+              recognition.start();
+            } catch (error) {
+              console.error("Error restarting after onerror:", error);
+              setIsListening(false);
+            }
+          }
+        }, 250);
+        return;
+      }
       setIsListening(false);
       toast({
         title: "Error",
@@ -67,7 +90,16 @@ export const VoiceTextarea = ({ value, onChange, ...props }: VoiceTextareaProps)
     };
 
     recognition.onend = () => {
-      setIsListening(false);
+      if (!shouldStopRef.current) {
+        try {
+          recognition.start();
+        } catch (error) {
+          console.error("Error restarting recognition:", error);
+          setIsListening(false);
+        }
+      } else {
+        setIsListening(false);
+      }
     };
 
     recognitionRef.current = recognition;
@@ -75,6 +107,7 @@ export const VoiceTextarea = ({ value, onChange, ...props }: VoiceTextareaProps)
   };
 
   const stopListening = () => {
+    shouldStopRef.current = true;
     if (recognitionRef.current) {
       recognitionRef.current.stop();
       setIsListening(false);
