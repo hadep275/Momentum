@@ -12,6 +12,7 @@ interface VoiceTextareaProps extends React.ComponentProps<typeof Textarea> {
 export const VoiceTextarea = ({ value, onChange, ...props }: VoiceTextareaProps) => {
   const [isListening, setIsListening] = useState(false);
   const recognitionRef = useRef<any>(null);
+  const shouldStopRef = useRef(false);
   const { toast } = useToast();
 
   const startListening = () => {
@@ -24,6 +25,7 @@ export const VoiceTextarea = ({ value, onChange, ...props }: VoiceTextareaProps)
       return;
     }
 
+    shouldStopRef.current = false;
     const SpeechRecognition = (window as any).webkitSpeechRecognition || (window as any).SpeechRecognition;
     const recognition = new SpeechRecognition();
     
@@ -68,7 +70,17 @@ export const VoiceTextarea = ({ value, onChange, ...props }: VoiceTextareaProps)
     };
 
     recognition.onend = () => {
-      setIsListening(false);
+      if (!shouldStopRef.current && recognitionRef.current) {
+        // Restart if not manually stopped
+        try {
+          recognitionRef.current.start();
+        } catch (error) {
+          console.error("Error restarting recognition:", error);
+          setIsListening(false);
+        }
+      } else {
+        setIsListening(false);
+      }
     };
 
     recognitionRef.current = recognition;
@@ -76,6 +88,7 @@ export const VoiceTextarea = ({ value, onChange, ...props }: VoiceTextareaProps)
   };
 
   const stopListening = () => {
+    shouldStopRef.current = true;
     if (recognitionRef.current) {
       recognitionRef.current.stop();
       setIsListening(false);
