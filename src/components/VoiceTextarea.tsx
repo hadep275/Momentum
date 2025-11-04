@@ -14,6 +14,7 @@ export const VoiceTextarea = ({ value, onChange, ...props }: VoiceTextareaProps)
   const recognitionRef = useRef<any>(null);
   const baseTextRef = useRef("");
   const shouldStopRef = useRef(false);
+  const lastProcessedIndexRef = useRef(0);
   const { toast } = useToast();
 
   const startListening = () => {
@@ -28,11 +29,13 @@ export const VoiceTextarea = ({ value, onChange, ...props }: VoiceTextareaProps)
 
     shouldStopRef.current = false;
     baseTextRef.current = value;
+    lastProcessedIndexRef.current = 0;
+    
     const SpeechRecognition = (window as any).webkitSpeechRecognition || (window as any).SpeechRecognition;
     const recognition = new SpeechRecognition();
     
     recognition.continuous = true;
-    recognition.interimResults = true;
+    recognition.interimResults = false;
     recognition.lang = "en-US";
 
     recognition.onstart = () => {
@@ -40,17 +43,17 @@ export const VoiceTextarea = ({ value, onChange, ...props }: VoiceTextareaProps)
     };
 
     recognition.onresult = (event: any) => {
-      let finalTranscript = "";
-
-      for (let i = event.resultIndex; i < event.results.length; i++) {
-        const transcript = event.results[i][0].transcript;
+      let newText = "";
+      
+      for (let i = lastProcessedIndexRef.current; i < event.results.length; i++) {
         if (event.results[i].isFinal) {
-          finalTranscript += transcript + " ";
+          newText += event.results[i][0].transcript + " ";
+          lastProcessedIndexRef.current = i + 1;
         }
       }
 
-      if (finalTranscript) {
-        baseTextRef.current = baseTextRef.current + finalTranscript;
+      if (newText) {
+        baseTextRef.current = baseTextRef.current + newText;
         const syntheticEvent = {
           target: { value: baseTextRef.current },
         } as React.ChangeEvent<HTMLTextAreaElement>;
