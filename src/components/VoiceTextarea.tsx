@@ -12,7 +12,7 @@ interface VoiceTextareaProps extends React.ComponentProps<typeof Textarea> {
 export const VoiceTextarea = ({ value, onChange, ...props }: VoiceTextareaProps) => {
   const [isListening, setIsListening] = useState(false);
   const recognitionRef = useRef<any>(null);
-  const shouldStopRef = useRef(false);
+  const baseTextRef = useRef("");
   const { toast } = useToast();
 
   const startListening = () => {
@@ -25,7 +25,7 @@ export const VoiceTextarea = ({ value, onChange, ...props }: VoiceTextareaProps)
       return;
     }
 
-    shouldStopRef.current = false;
+    baseTextRef.current = value;
     const SpeechRecognition = (window as any).webkitSpeechRecognition || (window as any).SpeechRecognition;
     const recognition = new SpeechRecognition();
     
@@ -38,22 +38,19 @@ export const VoiceTextarea = ({ value, onChange, ...props }: VoiceTextareaProps)
     };
 
     recognition.onresult = (event: any) => {
-      let interimTranscript = "";
       let finalTranscript = "";
 
       for (let i = event.resultIndex; i < event.results.length; i++) {
         const transcript = event.results[i][0].transcript;
         if (event.results[i].isFinal) {
           finalTranscript += transcript + " ";
-        } else {
-          interimTranscript += transcript;
         }
       }
 
       if (finalTranscript) {
-        const newValue = value + finalTranscript;
+        baseTextRef.current = baseTextRef.current + finalTranscript;
         const syntheticEvent = {
-          target: { value: newValue },
+          target: { value: baseTextRef.current },
         } as React.ChangeEvent<HTMLTextAreaElement>;
         onChange(syntheticEvent);
       }
@@ -70,17 +67,7 @@ export const VoiceTextarea = ({ value, onChange, ...props }: VoiceTextareaProps)
     };
 
     recognition.onend = () => {
-      if (!shouldStopRef.current && recognitionRef.current) {
-        // Restart if not manually stopped
-        try {
-          recognitionRef.current.start();
-        } catch (error) {
-          console.error("Error restarting recognition:", error);
-          setIsListening(false);
-        }
-      } else {
-        setIsListening(false);
-      }
+      setIsListening(false);
     };
 
     recognitionRef.current = recognition;
@@ -88,7 +75,6 @@ export const VoiceTextarea = ({ value, onChange, ...props }: VoiceTextareaProps)
   };
 
   const stopListening = () => {
-    shouldStopRef.current = true;
     if (recognitionRef.current) {
       recognitionRef.current.stop();
       setIsListening(false);
