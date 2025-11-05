@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Mic, MicOff } from "lucide-react";
@@ -85,6 +85,16 @@ export const VoiceTextarea = ({ value, onChange, ...props }: VoiceTextareaProps)
       setIsListening(false);
     }
   };
+
+  // Cleanup: auto-stop mic when component unmounts (e.g., navigating away)
+  useEffect(() => {
+    return () => {
+      if (recognitionRef.current && isListening) {
+        shouldStopRef.current = true;
+        recognitionRef.current.stop();
+      }
+    };
+  }, [isListening]);
 
   return (
     <div className="relative">
