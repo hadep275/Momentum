@@ -55,8 +55,9 @@ export const TaskItem = ({ task, onUpdate, onDelete, existingTags = [] }: TaskIt
     }
   };
 
-  const handleToggleComplete = () => {
-    const isCompleting = !task.completed;
+  const handleToggleComplete = (checked: boolean | 'indeterminate') => {
+    if (checked === 'indeterminate') return;
+    const isCompleting = checked;
     
     // If completing a recurring task, create a new instance
     if (isCompleting && task.recurrence) {
@@ -81,7 +82,7 @@ export const TaskItem = ({ task, onUpdate, onDelete, existingTags = [] }: TaskIt
       // Create new recurring task
       onUpdate(newRecurringTask);
     } else {
-      onUpdate({ ...task, completed: !task.completed });
+      onUpdate({ ...task, completed: checked });
     }
   };
 
