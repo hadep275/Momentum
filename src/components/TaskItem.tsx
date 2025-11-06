@@ -55,9 +55,8 @@ export const TaskItem = ({ task, onUpdate, onDelete, existingTags = [] }: TaskIt
     }
   };
 
-  const handleToggleComplete = (checked: boolean | 'indeterminate') => {
-    if (checked === 'indeterminate') return;
-    const isCompleting = checked;
+  const handleToggleComplete = () => {
+    const isCompleting = !task.completed;
     
     // If completing a recurring task, create a new instance
     if (isCompleting && task.recurrence) {
@@ -82,7 +81,7 @@ export const TaskItem = ({ task, onUpdate, onDelete, existingTags = [] }: TaskIt
       // Create new recurring task
       onUpdate(newRecurringTask);
     } else {
-      onUpdate({ ...task, completed: checked });
+      onUpdate({ ...task, completed: !task.completed });
     }
   };
 
@@ -190,7 +189,7 @@ export const TaskItem = ({ task, onUpdate, onDelete, existingTags = [] }: TaskIt
         <div className="flex items-start gap-3">
           <Checkbox
             checked={task.completed}
-            onCheckedChange={handleToggleComplete}
+            onCheckedChange={() => handleToggleComplete()}
             className="mt-1"
           />
           <h3 className={`flex-1 font-semibold ${task.completed ? "line-through text-muted-foreground" : ""}`}>
