@@ -17,9 +17,11 @@ interface TaskItemProps {
   onUpdate: (task: Task) => void;
   onDelete: (taskId: string) => void;
   existingTags?: string[];
+  onUpdateTasks?: (tasks: Task[]) => void;
+  allTasks?: Task[];
 }
 
-export const TaskItem = ({ task, onUpdate, onDelete, existingTags = [] }: TaskItemProps) => {
+export const TaskItem = ({ task, onUpdate, onDelete, existingTags = [], onUpdateTasks, allTasks = [] }: TaskItemProps) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
 
@@ -56,11 +58,10 @@ export const TaskItem = ({ task, onUpdate, onDelete, existingTags = [] }: TaskIt
   };
 
   const handleToggleComplete = () => {
-    console.log('[TaskItem] toggle', { id: task.id, before: task.completed });
     const isCompleting = !task.completed;
     
     // If completing a recurring task, create a new instance
-    if (isCompleting && task.recurrence) {
+    if (isCompleting && task.recurrence && onUpdateTasks && allTasks) {
       const nextDueDate = calculateNextDueDate(new Date(task.dueDate), task.recurrence);
       
       const newRecurringTask: Task = {
@@ -76,11 +77,11 @@ export const TaskItem = ({ task, onUpdate, onDelete, existingTags = [] }: TaskIt
         }))
       };
       
-      // Update current task as completed
-      onUpdate({ ...task, completed: true });
-      
-      // Create new recurring task
-      onUpdate(newRecurringTask);
+      // Update tasks: mark current as completed, add new recurring task
+      const updatedTasks = allTasks.map(t => 
+        t.id === task.id ? { ...task, completed: true } : t
+      );
+      onUpdateTasks([...updatedTasks, newRecurringTask]);
     } else {
       onUpdate({ ...task, completed: !task.completed });
     }

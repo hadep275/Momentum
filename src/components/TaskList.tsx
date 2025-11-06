@@ -259,6 +259,8 @@ export const TaskList = ({ tasks, onUpdateTasks, habits, onUpdateHabits, hideCom
                 onUpdate={handleUpdateTask}
                 onDelete={handleDeleteTask}
                 existingTags={allTags}
+                onUpdateTasks={onUpdateTasks}
+                allTasks={tasks}
               />
             ))}
           </div>
