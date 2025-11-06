@@ -65,7 +65,11 @@ export const ToDoItem = ({
     >
       <Checkbox
         checked={todo.completed}
-        onCheckedChange={() => onToggle(todo.id)}
+        onCheckedChange={() => {
+          console.log('[ToDoItem] toggle', { id: todo.id, before: todo.completed });
+          onToggle(todo.id);
+        }}
+        onPointerDown={(e) => e.stopPropagation()}
         className="shrink-0"
       />
       

@@ -56,6 +56,7 @@ export const TaskItem = ({ task, onUpdate, onDelete, existingTags = [] }: TaskIt
   };
 
   const handleToggleComplete = () => {
+    console.log('[TaskItem] toggle', { id: task.id, before: task.completed });
     const isCompleting = !task.completed;
     
     // If completing a recurring task, create a new instance
@@ -190,6 +191,7 @@ export const TaskItem = ({ task, onUpdate, onDelete, existingTags = [] }: TaskIt
           <Checkbox
             checked={task.completed}
             onCheckedChange={() => handleToggleComplete()}
+            onPointerDown={(e) => e.stopPropagation()}
             className="mt-1"
           />
           <h3 className={`flex-1 font-semibold ${task.completed ? "line-through text-muted-foreground" : ""}`}>
