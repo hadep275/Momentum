@@ -24,8 +24,9 @@ const DB_NAME = 'momentum-notifications';
 const DB_VERSION = 1;
 const STORE_NAME = 'schedules';
 
-// Workbox manifest injection point
-self.__WB_MANIFEST;
+// Workbox manifest injection point - this will be replaced by Workbox
+const manifest = self.__WB_MANIFEST;
+console.log('Service Worker loaded with manifest:', manifest);
 
 // Open IndexedDB
 function openDB(): Promise<IDBDatabase> {
