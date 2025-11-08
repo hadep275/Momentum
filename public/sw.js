@@ -4,6 +4,9 @@ const DB_NAME = 'momentum-notifications';
 const DB_VERSION = 1;
 const STORE_NAME = 'schedules';
 
+// Workbox manifest injection point
+self.__WB_MANIFEST;
+
 // Open IndexedDB
 function openDB() {
   return new Promise((resolve, reject) => {
