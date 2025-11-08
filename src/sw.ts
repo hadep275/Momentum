@@ -1,3 +1,23 @@
+/// <reference lib="webworker" />
+declare const self: ServiceWorkerGlobalScope;
+
+// Extend ServiceWorkerGlobalScope for Workbox
+declare global {
+  interface ServiceWorkerGlobalScope {
+    __WB_MANIFEST: any;
+  }
+}
+
+// Notification schedule interface
+interface NotificationSchedule {
+  id: string;
+  title: string;
+  body: string;
+  triggerTime: number;
+  notified?: boolean;
+  type: 'task' | 'habit';
+}
+
 // Service Worker for background notifications
 const CACHE_NAME = 'momentum-v1';
 const DB_NAME = 'momentum-notifications';
@@ -8,7 +28,7 @@ const STORE_NAME = 'schedules';
 self.__WB_MANIFEST;
 
 // Open IndexedDB
-function openDB() {
+function openDB(): Promise<IDBDatabase> {
   return new Promise((resolve, reject) => {
     const request = indexedDB.open(DB_NAME, DB_VERSION);
     
@@ -16,7 +36,7 @@ function openDB() {
     request.onsuccess = () => resolve(request.result);
     
     request.onupgradeneeded = (event) => {
-      const db = event.target.result;
+      const db = (event.target as IDBOpenDBRequest).result;
       if (!db.objectStoreNames.contains(STORE_NAME)) {
         db.createObjectStore(STORE_NAME, { keyPath: 'id' });
       }
@@ -25,7 +45,7 @@ function openDB() {
 }
 
 // Get all notification schedules
-async function getSchedules() {
+async function getSchedules(): Promise<NotificationSchedule[]> {
   try {
     const db = await openDB();
     return new Promise((resolve, reject) => {
@@ -61,8 +81,7 @@ async function checkNotifications() {
           badge: '/momentum-logo.png',
           tag: schedule.id,
           requireInteraction: false,
-          vibrate: [200, 100, 200],
-        });
+        } as NotificationOptions);
         
         // Mark as notified
         const db = await openDB();
@@ -106,7 +125,7 @@ self.addEventListener('notificationclick', (event) => {
   event.notification.close();
   
   event.waitUntil(
-    clients.matchAll({ type: 'window', includeUncontrolled: true })
+    self.clients.matchAll({ type: 'window', includeUncontrolled: true })
       .then((clientList) => {
         // Focus existing window or open new one
         for (const client of clientList) {
@@ -114,8 +133,8 @@ self.addEventListener('notificationclick', (event) => {
             return client.focus();
           }
         }
-        if (clients.openWindow) {
-          return clients.openWindow('/');
+        if (self.clients.openWindow) {
+          return self.clients.openWindow('/');
         }
       })
   );
