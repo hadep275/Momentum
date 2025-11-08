@@ -78,8 +78,8 @@ async function checkNotifications() {
         // Show notification
         await self.registration.showNotification(schedule.title, {
           body: schedule.body,
-          icon: '/momentum-logo.png',
-          badge: '/momentum-logo.png',
+          icon: '/Momentum/momentum-logo.png',
+          badge: '/Momentum/momentum-logo.png',
           tag: schedule.id,
           requireInteraction: false,
         } as NotificationOptions);
@@ -135,7 +135,7 @@ self.addEventListener('notificationclick', (event) => {
           }
         }
         if (self.clients.openWindow) {
-          return self.clients.openWindow('/');
+          return self.clients.openWindow('/Momentum/');
         }
       })
   );
