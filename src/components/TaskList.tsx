@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Plus, CheckSquare, ListTodo, Layers } from "lucide-react";
+import { Plus, CheckSquare, ListTodo, Layers, CalendarRange } from "lucide-react";
 import { SearchBar } from "@/components/SearchBar";
 import { TaskItem } from "@/components/TaskItem";
 import { HabitItem } from "@/components/HabitItem";
@@ -10,6 +10,7 @@ import { CreateHabitDialog } from "@/components/CreateHabitDialog";
 import { EditHabitDialog } from "@/components/EditHabitDialog";
 import { TemplatesDialog } from "@/components/TemplatesDialog";
 import { CategoryFilter } from "@/components/CategoryFilter";
+import { CalendarExportDialog } from "@/components/CalendarExportDialog";
 import { Task, Habit } from "@/types/task";
 import { isSameDay, format } from "date-fns";
 import {
@@ -35,6 +36,7 @@ export const TaskList = ({ tasks, onUpdateTasks, habits, onUpdateHabits, hideCom
   const [isCreateHabitDialogOpen, setIsCreateHabitDialogOpen] = useState(false);
   const [isNewItemSheetOpen, setIsNewItemSheetOpen] = useState(false);
   const [isTemplatesDialogOpen, setIsTemplatesDialogOpen] = useState(false);
+  const [isExportDialogOpen, setIsExportDialogOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [editingHabit, setEditingHabit] = useState<Habit | null>(null);
 
@@ -220,13 +222,24 @@ export const TaskList = ({ tasks, onUpdateTasks, habits, onUpdateHabits, hideCom
           <h2 className="text-2xl font-semibold">Today's Focus</h2>
           <p className="text-sm text-muted-foreground">Tasks and habits for today</p>
         </div>
-        <Button 
-          onClick={() => setIsNewItemSheetOpen(true)} 
-          size="icon"
-          className="h-12 w-12 rounded-full min-h-[44px]"
-        >
-          <Plus className="w-5 h-5" />
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button 
+            onClick={() => setIsExportDialogOpen(true)} 
+            size="icon"
+            variant="outline"
+            className="h-12 w-12 rounded-full min-h-[44px]"
+            title="Export to calendar"
+          >
+            <CalendarRange className="w-5 h-5" />
+          </Button>
+          <Button 
+            onClick={() => setIsNewItemSheetOpen(true)} 
+            size="icon"
+            className="h-12 w-12 rounded-full min-h-[44px]"
+          >
+            <Plus className="w-5 h-5" />
+          </Button>
+        </div>
       </div>
 
       <SearchBar value={searchQuery} onChange={onSearchQueryChange} />
@@ -373,6 +386,13 @@ export const TaskList = ({ tasks, onUpdateTasks, habits, onUpdateHabits, hideCom
         onOpenChange={(open) => !open && setEditingHabit(null)}
         habit={editingHabit}
         onUpdateHabit={handleUpdateHabit}
+      />
+
+      <CalendarExportDialog
+        open={isExportDialogOpen}
+        onOpenChange={setIsExportDialogOpen}
+        tasks={tasks}
+        habits={habits}
       />
     </div>
   );

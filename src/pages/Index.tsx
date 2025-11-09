@@ -17,6 +17,7 @@ import { ToDoList } from "@/components/ToDoList";
 import { useNotificationScheduler } from "@/hooks/useNotificationScheduler";
 import { toast } from "sonner";
 import momentumLogo from "@/assets/momentum-logo.png";
+import { format } from "date-fns";
 
 const TASKS_STORAGE_KEY = "momentum-tasks";
 const HABITS_STORAGE_KEY = "momentum-habits";
@@ -262,6 +263,104 @@ const Index = () => {
     toast.success("Note deleted");
   };
 
+  const handleExportData = () => {
+    const exportData = {
+      version: "1.0",
+      exportDate: new Date().toISOString(),
+      tasks,
+      habits,
+      todos,
+      notes,
+      settings: {
+        hideCompletedHabits,
+        hideCompletedTasks,
+        theme,
+      },
+    };
+
+    const dataStr = JSON.stringify(exportData, null, 2);
+    const blob = new Blob([dataStr], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `momentum-backup-${format(new Date(), 'yyyy-MM-dd')}.json`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+
+    toast.success("Data exported!", {
+      description: "Your backup file has been downloaded",
+    });
+  };
+
+  const handleImportData = (dataStr: string) => {
+    try {
+      const importData = JSON.parse(dataStr);
+
+      if (!importData.tasks && !importData.habits && !importData.todos) {
+        throw new Error("Invalid backup file");
+      }
+
+      // Import tasks
+      if (importData.tasks) {
+        const importedTasks = importData.tasks.map((task: any) => ({
+          ...task,
+          createdAt: new Date(task.createdAt),
+          dueDate: new Date(task.dueDate),
+        }));
+        setTasks(importedTasks);
+      }
+
+      // Import habits
+      if (importData.habits) {
+        const importedHabits = importData.habits.map((habit: any) => ({
+          ...habit,
+          createdAt: new Date(habit.createdAt),
+        }));
+        setHabits(importedHabits);
+      }
+
+      // Import todos
+      if (importData.todos) {
+        const importedTodos = importData.todos.map((todo: any) => ({
+          ...todo,
+          createdAt: new Date(todo.createdAt),
+        }));
+        setTodos(importedTodos);
+      }
+
+      // Import notes
+      if (importData.notes) {
+        setNotes(importData.notes);
+      }
+
+      // Import settings
+      if (importData.settings) {
+        if (importData.settings.hideCompletedHabits !== undefined) {
+          setHideCompletedHabits(importData.settings.hideCompletedHabits);
+        }
+        if (importData.settings.hideCompletedTasks !== undefined) {
+          setHideCompletedTasks(importData.settings.hideCompletedTasks);
+        }
+        if (importData.settings.theme) {
+          handleThemeChange(importData.settings.theme);
+        }
+      }
+
+      toast.success("Data imported!", {
+        description: "Your backup has been restored successfully",
+      });
+
+      setIsSettingsOpen(false);
+    } catch (error) {
+      console.error("Import error:", error);
+      toast.error("Import failed", {
+        description: "Please check that you're using a valid Momentum backup file",
+      });
+    }
+  };
+
   const handleResetData = () => {
     // Clear localStorage
     localStorage.removeItem(TASKS_STORAGE_KEY);
@@ -394,6 +493,8 @@ const Index = () => {
           theme={theme}
           onThemeChange={handleThemeChange}
           onResetData={handleResetData}
+          onExportData={handleExportData}
+          onImportData={handleImportData}
         />
 
         <InstallPWA />

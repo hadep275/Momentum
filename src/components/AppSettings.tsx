@@ -18,9 +18,10 @@ import {
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
-import { Trash2, Bell } from "lucide-react";
+import { Trash2, Bell, Download, Upload } from "lucide-react";
 import { useNotifications } from "@/hooks/useNotifications";
 import { toast } from "sonner";
+import { useRef } from "react";
 import {
   Select,
   SelectContent,
@@ -39,6 +40,8 @@ interface AppSettingsProps {
   theme: string;
   onThemeChange: (theme: string) => void;
   onResetData: () => void;
+  onExportData: () => void;
+  onImportData: (data: string) => void;
 }
 
 export const AppSettings = ({
@@ -51,8 +54,32 @@ export const AppSettings = ({
   theme,
   onThemeChange,
   onResetData,
+  onExportData,
+  onImportData,
 }: AppSettingsProps) => {
   const { permission, isSupported, requestPermission } = useNotifications();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleImportClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const content = event.target?.result as string;
+      onImportData(content);
+    };
+    reader.readAsText(file);
+    
+    // Reset input
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
 
   const handleNotificationRequest = async () => {
     if (!isSupported) {
@@ -156,6 +183,44 @@ export const AppSettings = ({
                 <SelectItem value="dark">Dark Mode</SelectItem>
               </SelectContent>
             </Select>
+          </div>
+
+          <div className="border-t pt-6 pb-6">
+            <div className="space-y-3">
+              <div className="space-y-0.5">
+                <Label>Backup & Restore</Label>
+                <p className="text-sm text-muted-foreground">
+                  Export all your data to backup or transfer to another device
+                </p>
+              </div>
+              <div className="flex gap-2">
+                <Button 
+                  onClick={onExportData}
+                  variant="outline"
+                  className="flex-1"
+                  size="sm"
+                >
+                  <Download className="h-4 w-4 mr-2" />
+                  Export Data
+                </Button>
+                <Button 
+                  onClick={handleImportClick}
+                  variant="outline"
+                  className="flex-1"
+                  size="sm"
+                >
+                  <Upload className="h-4 w-4 mr-2" />
+                  Import Data
+                </Button>
+              </div>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept=".json"
+                onChange={handleFileChange}
+                className="hidden"
+              />
+            </div>
           </div>
 
           <div className="border-t pt-6 pb-6">
