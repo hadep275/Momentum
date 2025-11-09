@@ -220,30 +220,13 @@ export const TaskList = ({ tasks, onUpdateTasks, habits, onUpdateHabits, hideCom
           <h2 className="text-2xl font-semibold">Today's Focus</h2>
           <p className="text-sm text-muted-foreground">Tasks and habits for today</p>
         </div>
-        <div className="flex items-center gap-2">
-          <Button 
-            variant="outline"
-            size="icon"
-            className="h-12 w-12 rounded-full min-h-[44px]"
-            asChild
-          >
-            <a 
-              href="https://www.buymeacoffee.com/Momentumapp" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              aria-label="Buy me a coffee"
-            >
-              ☕
-            </a>
-          </Button>
-          <Button 
-            onClick={() => setIsNewItemSheetOpen(true)} 
-            size="icon"
-            className="h-12 w-12 rounded-full min-h-[44px]"
-          >
-            <Plus className="w-5 h-5" />
-          </Button>
-        </div>
+        <Button 
+          onClick={() => setIsNewItemSheetOpen(true)} 
+          size="icon"
+          className="h-12 w-12 rounded-full min-h-[44px]"
+        >
+          <Plus className="w-5 h-5" />
+        </Button>
       </div>
 
       <SearchBar value={searchQuery} onChange={onSearchQueryChange} />
