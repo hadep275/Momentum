@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Plus, CheckSquare, ListTodo, Layers, CalendarRange } from "lucide-react";
+import { Plus, CheckSquare, ListTodo, Layers, CalendarRange, Coffee } from "lucide-react";
 import { SearchBar } from "@/components/SearchBar";
 import { TaskItem } from "@/components/TaskItem";
 import { HabitItem } from "@/components/HabitItem";
@@ -11,6 +11,7 @@ import { EditHabitDialog } from "@/components/EditHabitDialog";
 import { TemplatesDialog } from "@/components/TemplatesDialog";
 import { CategoryFilter } from "@/components/CategoryFilter";
 import { CalendarExportDialog } from "@/components/CalendarExportDialog";
+import { BuyMeCoffeeDialog } from "@/components/BuyMeCoffeeDialog";
 import { Task, Habit } from "@/types/task";
 import { isSameDay, format } from "date-fns";
 import {
@@ -37,6 +38,7 @@ export const TaskList = ({ tasks, onUpdateTasks, habits, onUpdateHabits, hideCom
   const [isNewItemSheetOpen, setIsNewItemSheetOpen] = useState(false);
   const [isTemplatesDialogOpen, setIsTemplatesDialogOpen] = useState(false);
   const [isExportDialogOpen, setIsExportDialogOpen] = useState(false);
+  const [isCoffeeDialogOpen, setIsCoffeeDialogOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [editingHabit, setEditingHabit] = useState<Habit | null>(null);
 
@@ -233,6 +235,15 @@ export const TaskList = ({ tasks, onUpdateTasks, habits, onUpdateHabits, hideCom
             <CalendarRange className="w-5 h-5" />
           </Button>
           <Button 
+            onClick={() => setIsCoffeeDialogOpen(true)} 
+            size="icon"
+            variant="outline"
+            className="h-12 w-12 rounded-full min-h-[44px]"
+            title="Buy Me a Coffee"
+          >
+            <Coffee className="w-5 h-5" />
+          </Button>
+          <Button 
             onClick={() => setIsNewItemSheetOpen(true)} 
             size="icon"
             className="h-12 w-12 rounded-full min-h-[44px]"
@@ -393,6 +404,11 @@ export const TaskList = ({ tasks, onUpdateTasks, habits, onUpdateHabits, hideCom
         onOpenChange={setIsExportDialogOpen}
         tasks={tasks}
         habits={habits}
+      />
+
+      <BuyMeCoffeeDialog
+        open={isCoffeeDialogOpen}
+        onOpenChange={setIsCoffeeDialogOpen}
       />
     </div>
   );
