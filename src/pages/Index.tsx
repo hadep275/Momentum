@@ -5,6 +5,7 @@ import { Analytics } from "@/components/Analytics";
 import { AppSettings } from "@/components/AppSettings";
 import { InstallPWA } from "@/components/InstallPWA";
 import { SplashScreen } from "@/components/SplashScreen";
+import { VoiceAgent } from "@/components/VoiceAgent";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { ListTodo, CalendarDays, BarChart3, Settings, StickyNote } from "lucide-react";
@@ -34,6 +35,7 @@ const Index = () => {
 
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [activeTab, setActiveTab] = useState("tasks");
 
   useEffect(() => {
     if (showSplash) {
@@ -316,7 +318,7 @@ const Index = () => {
           </div>
         </header>
 
-        <Tabs defaultValue="tasks" className="w-full">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsContent value="tasks" className="space-y-4">
             <TaskList 
               tasks={tasks} 
@@ -395,6 +397,16 @@ const Index = () => {
         />
 
         <InstallPWA />
+
+        <VoiceAgent
+          tasks={tasks}
+          habits={habits}
+          todos={todos}
+          setTasks={setTasks}
+          setHabits={setHabits}
+          setTodos={setTodos}
+          onNavigate={setActiveTab}
+        />
       </div>
     </div>
     </>
