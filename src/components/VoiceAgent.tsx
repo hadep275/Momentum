@@ -72,7 +72,7 @@ export const VoiceAgent = ({
         onClick={toggleAgent}
         size="icon"
         className={cn(
-          "fixed bottom-20 right-4 h-16 w-16 rounded-full shadow-lg z-50 transition-all",
+          "fixed bottom-20 right-4 h-16 w-16 rounded-full shadow-lg z-50 transition-all bg-transparent hover:bg-transparent",
           isListening && "animate-pulse bg-accent scale-110",
           isSpeaking && "animate-bounce bg-secondary"
         )}

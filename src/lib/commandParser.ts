@@ -113,8 +113,59 @@ const parseDaysOfWeek = (text: string): number[] => {
 export const parseCommand = (input: string): ParsedCommand => {
   const lowerInput = input.toLowerCase().trim();
 
-  // Task commands
-  if (/create|add|make|new.*task/i.test(lowerInput)) {
+  // Habit commands (check before tasks to avoid confusion)
+  if (/(?:create|add|make|new).*habit/i.test(lowerInput)) {
+    const titleMatch = input.match(/(?:habit|add|create|make|new)\s+(.+?)(?:\s+(?:on|for|at|every|category)|\s*$)/i);
+    const title = titleMatch ? titleMatch[1].trim() : "New Habit";
+
+    return {
+      action: "create",
+      entity: "habit",
+      params: {
+        title,
+        daysOfWeek: parseDaysOfWeek(input),
+        time: parseTime(input),
+        categoryId: parseCategory(input),
+      },
+    };
+  }
+
+  if (/(?:complete|done|check).*habit/i.test(lowerInput)) {
+    const titleMatch = input.match(/(?:complete|done|check)\s+(?:habit\s+)?(.+)/i);
+    const title = titleMatch ? titleMatch[1].trim() : "";
+
+    return {
+      action: "complete",
+      entity: "habit",
+      params: { title },
+    };
+  }
+
+  // Todo commands (check before tasks)
+  if (/(?:create|add|make|new).*(?:todo|to-do|to do)/i.test(lowerInput)) {
+    const titleMatch = input.match(/(?:todo|to-do|to do|add|create|make|new)\s+(.+)/i);
+    const title = titleMatch ? titleMatch[1].trim() : "New Todo";
+
+    return {
+      action: "create",
+      entity: "todo",
+      params: { title },
+    };
+  }
+
+  if (/(?:complete|done|check).*(?:todo|to-do|to do)/i.test(lowerInput)) {
+    const titleMatch = input.match(/(?:complete|done|check)\s+(?:todo|to-do|to do)?\s*(.+)/i);
+    const title = titleMatch ? titleMatch[1].trim() : "";
+
+    return {
+      action: "complete",
+      entity: "todo",
+      params: { title },
+    };
+  }
+
+  // Task commands (check after habits and todos)
+  if (/(?:create|add|make|new).*task/i.test(lowerInput)) {
     const titleMatch = input.match(/(?:task|add|create|make|new)\s+(.+?)(?:\s+(?:for|due|on|by|at|with|priority|category|tag)|\s*$)/i);
     const title = titleMatch ? titleMatch[1].trim() : "New Task";
 
@@ -133,7 +184,7 @@ export const parseCommand = (input: string): ParsedCommand => {
     };
   }
 
-  if (/complete|finish|done|check off.*task/i.test(lowerInput)) {
+  if (/(?:complete|finish|done|check off).*task/i.test(lowerInput)) {
     const titleMatch = input.match(/(?:complete|finish|done|check off)\s+(?:task\s+)?(.+)/i);
     const title = titleMatch ? titleMatch[1].trim() : "";
 
@@ -144,7 +195,7 @@ export const parseCommand = (input: string): ParsedCommand => {
     };
   }
 
-  if (/delete|remove.*task/i.test(lowerInput)) {
+  if (/(?:delete|remove).*task/i.test(lowerInput)) {
     const titleMatch = input.match(/(?:delete|remove)\s+(?:task\s+)?(.+)/i);
     const title = titleMatch ? titleMatch[1].trim() : "";
 
@@ -207,7 +258,7 @@ export const parseCommand = (input: string): ParsedCommand => {
   }
 
   // Template commands
-  if (/apply|use.*template/i.test(lowerInput)) {
+  if (/(?:apply|use).*template/i.test(lowerInput)) {
     const templateMatch = input.match(/(?:apply|use)\s+(?:template\s+)?(.+)/i);
     const templateName = templateMatch ? templateMatch[1].trim() : "";
 
@@ -239,7 +290,7 @@ export const parseCommand = (input: string): ParsedCommand => {
   }
 
   // Analytics commands
-  if (/show|display|view.*(?:analytics|stats|statistics|progress)/i.test(lowerInput)) {
+  if (/(?:show|display|view).*(?:analytics|stats|statistics|progress)/i.test(lowerInput)) {
     return {
       action: "show",
       entity: "analytics",
@@ -248,7 +299,7 @@ export const parseCommand = (input: string): ParsedCommand => {
   }
 
   // Search commands
-  if (/search|find|look for/i.test(lowerInput)) {
+  if (/(?:search|find|look for)/i.test(lowerInput)) {
     const queryMatch = input.match(/(?:search|find|look for)\s+(.+)/i);
     const query = queryMatch ? queryMatch[1].trim() : "";
 
@@ -260,7 +311,7 @@ export const parseCommand = (input: string): ParsedCommand => {
   }
 
   // List/show commands
-  if (/show|list|display.*(?:tasks?|habits?|todos?)/i.test(lowerInput)) {
+  if (/(?:show|list|display).*(?:tasks?|habits?|todos?)/i.test(lowerInput)) {
     let entity: "task" | "habit" | "todo" = "task";
     if (/habits?/i.test(lowerInput)) entity = "habit";
     if (/todos?|to-dos?/i.test(lowerInput)) entity = "todo";
@@ -273,7 +324,7 @@ export const parseCommand = (input: string): ParsedCommand => {
   }
 
   // Help command
-  if (/help|what can you do|commands/i.test(lowerInput)) {
+  if (/(?:help|what can you do|commands)/i.test(lowerInput)) {
     return {
       action: "help",
       entity: "unknown",

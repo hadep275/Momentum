@@ -94,7 +94,7 @@ export const useVoiceAgent = ({ onCommand }: UseVoiceAgentProps) => {
     const SpeechRecognition = (window as any).webkitSpeechRecognition || (window as any).SpeechRecognition;
     const recognition = new SpeechRecognition();
 
-    recognition.continuous = false;
+    recognition.continuous = true;
     recognition.interimResults = false;
     recognition.lang = "en-US";
 
@@ -103,21 +103,28 @@ export const useVoiceAgent = ({ onCommand }: UseVoiceAgentProps) => {
     };
 
     recognition.onresult = (event: any) => {
-      const transcript = event.results[0][0].transcript;
+      const transcript = event.results[event.results.length - 1][0].transcript;
       processCommand(transcript);
     };
 
     recognition.onerror = (event: any) => {
       console.error("Speech recognition error:", event.error);
-      setIsListening(false);
-      
       if (event.error !== "no-speech" && event.error !== "aborted") {
         toast.error("Voice input error. Please try again.");
       }
     };
 
     recognition.onend = () => {
-      setIsListening(false);
+      if (!shouldStopRef.current) {
+        try {
+          recognition.start();
+        } catch (error) {
+          console.error("Error restarting recognition:", error);
+          setIsListening(false);
+        }
+      } else {
+        setIsListening(false);
+      }
     };
 
     recognitionRef.current = recognition;
