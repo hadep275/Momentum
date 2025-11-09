@@ -197,15 +197,4 @@ All colors MUST be HSL.
     scrollbar-width: thin;
     scrollbar-color: hsl(var(--gold)) hsl(var(--muted));
   }
-
-  /* Buy Me a Coffee widget transparency */
-  #bmc-wbtn {
-    background-color: transparent !important;
-    border-radius: 0 !important;
-    box-shadow: none !important;
-  }
-
-  #bmc-wbtn:hover {
-    background-color: transparent !important;
-  }
 }

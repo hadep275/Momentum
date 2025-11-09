@@ -76,11 +76,11 @@ export const AppSettings = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-md">
+      <DialogContent className="max-w-md max-h-[85vh] flex flex-col">
         <DialogHeader>
           <DialogTitle>Settings</DialogTitle>
         </DialogHeader>
-        <div className="space-y-6 py-4">
+        <div className="space-y-6 py-4 overflow-y-auto flex-1 pr-2">
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">
               <Label htmlFor="hide-completed-tasks">Hide completed tasks</Label>
