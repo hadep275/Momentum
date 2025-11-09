@@ -158,6 +158,32 @@ export const AppSettings = ({
             </Select>
           </div>
 
+          <div className="border-t pt-6 pb-6">
+            <div className="space-y-3">
+              <div className="space-y-0.5">
+                <Label>Support Development</Label>
+                <p className="text-sm text-muted-foreground">
+                  Help keep Momentum free and actively developed
+                </p>
+              </div>
+              <Button 
+                variant="outline"
+                className="w-full"
+                size="sm"
+                asChild
+              >
+                <a 
+                  href="https://www.buymeacoffee.com/Momentumapp" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-center gap-2"
+                >
+                  ☕ Buy me a coffee
+                </a>
+              </Button>
+            </div>
+          </div>
+
           <div className="border-t pt-6">
             <div className="space-y-3">
               <div>
