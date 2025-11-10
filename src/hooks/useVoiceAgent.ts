@@ -20,6 +20,7 @@ export const useVoiceAgent = ({ onCommand }: UseVoiceAgentProps) => {
   const recognitionRef = useRef<any>(null);
   const shouldStopRef = useRef(false);
   const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
+  const commandTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Check browser support
   const isSupported = () => {
@@ -104,7 +105,16 @@ export const useVoiceAgent = ({ onCommand }: UseVoiceAgentProps) => {
 
     recognition.onresult = (event: any) => {
       const transcript = event.results[event.results.length - 1][0].transcript;
-      processCommand(transcript);
+      
+      // Clear any existing timeout
+      if (commandTimeoutRef.current) {
+        clearTimeout(commandTimeoutRef.current);
+      }
+      
+      // Wait 1.5 seconds before processing to let user finish their thought
+      commandTimeoutRef.current = setTimeout(() => {
+        processCommand(transcript);
+      }, 1500);
     };
 
     recognition.onerror = (event: any) => {

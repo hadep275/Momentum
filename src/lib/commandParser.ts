@@ -1,6 +1,6 @@
 export interface ParsedCommand {
   action: string;
-  entity: "task" | "habit" | "todo" | "template" | "timer" | "analytics" | "search" | "unknown";
+  entity: "task" | "habit" | "todo" | "template" | "timer" | "analytics" | "notes" | "calendar" | "tasks" | "habits" | "todos" | "search" | "unknown";
   params: Record<string, any>;
 }
 
@@ -52,8 +52,18 @@ const parseTime = (text: string): string | null => {
     const minutes = timeMatch[2] ? parseInt(timeMatch[2]) : 0;
     const meridiem = timeMatch[3]?.toLowerCase();
 
-    if (meridiem === "pm" && hours < 12) hours += 12;
-    if (meridiem === "am" && hours === 12) hours = 0;
+    // If no AM/PM specified and hour is ambiguous (1-11), infer based on current time
+    if (!meridiem && hours >= 1 && hours <= 11) {
+      const currentHour = new Date().getHours();
+      // If it's afternoon/evening and they said a morning hour, assume they meant PM
+      if (currentHour >= 12 && hours < 12) {
+        hours += 12;
+      }
+    } else {
+      // Explicit AM/PM handling
+      if (meridiem === "pm" && hours < 12) hours += 12;
+      if (meridiem === "am" && hours === 12) hours = 0;
+    }
 
     return `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}`;
   }
@@ -116,7 +126,10 @@ export const parseCommand = (input: string): ParsedCommand => {
   // Habit commands (check before tasks to avoid confusion)
   if (/(?:create|add|make|new).*habit/i.test(lowerInput)) {
     const titleMatch = input.match(/(?:habit|add|create|make|new)\s+(.+?)(?:\s+(?:on|for|at|every|category)|\s*$)/i);
-    const title = titleMatch ? titleMatch[1].trim() : "New Habit";
+    let title = titleMatch ? titleMatch[1].trim() : "New Habit";
+    
+    // Remove common leading prepositions
+    title = title.replace(/^(for|to|with|about|regarding)\s+/i, "");
 
     return {
       action: "create",
@@ -144,7 +157,10 @@ export const parseCommand = (input: string): ParsedCommand => {
   // Todo commands (check before tasks)
   if (/(?:create|add|make|new).*(?:todo|to-do|to do)/i.test(lowerInput)) {
     const titleMatch = input.match(/(?:todo|to-do|to do|add|create|make|new)\s+(.+)/i);
-    const title = titleMatch ? titleMatch[1].trim() : "New Todo";
+    let title = titleMatch ? titleMatch[1].trim() : "New Todo";
+    
+    // Remove common leading prepositions
+    title = title.replace(/^(for|to|with|about|regarding)\s+/i, "");
 
     return {
       action: "create",
@@ -167,7 +183,10 @@ export const parseCommand = (input: string): ParsedCommand => {
   // Task commands (check after habits and todos)
   if (/(?:create|add|make|new).*task/i.test(lowerInput)) {
     const titleMatch = input.match(/(?:task|add|create|make|new)\s+(.+?)(?:\s+(?:for|due|on|by|at|with|priority|category|tag)|\s*$)/i);
-    const title = titleMatch ? titleMatch[1].trim() : "New Task";
+    let title = titleMatch ? titleMatch[1].trim() : "New Task";
+    
+    // Remove common leading prepositions
+    title = title.replace(/^(for|to|with|about|regarding)\s+/i, "");
 
     return {
       action: "create",
@@ -289,11 +308,51 @@ export const parseCommand = (input: string): ParsedCommand => {
     };
   }
 
-  // Analytics commands
-  if (/(?:show|display|view).*(?:analytics|stats|statistics|progress)/i.test(lowerInput)) {
+  // Navigation commands
+  if (/(?:show|open|go to|display|view|navigate to).*(?:analytics|stats|statistics|progress)/i.test(lowerInput)) {
     return {
-      action: "show",
+      action: "navigate",
       entity: "analytics",
+      params: {},
+    };
+  }
+
+  if (/(?:show|open|go to|display|view|navigate to).*(?:notes?)/i.test(lowerInput)) {
+    return {
+      action: "navigate",
+      entity: "notes",
+      params: {},
+    };
+  }
+
+  if (/(?:show|open|go to|display|view|navigate to).*(?:calendar)/i.test(lowerInput)) {
+    return {
+      action: "navigate",
+      entity: "calendar",
+      params: {},
+    };
+  }
+
+  if (/(?:show|open|go to|display|view|navigate to).*(?:tasks?)/i.test(lowerInput)) {
+    return {
+      action: "navigate",
+      entity: "tasks",
+      params: {},
+    };
+  }
+
+  if (/(?:show|open|go to|display|view|navigate to).*(?:habits?)/i.test(lowerInput)) {
+    return {
+      action: "navigate",
+      entity: "habits",
+      params: {},
+    };
+  }
+
+  if (/(?:show|open|go to|display|view|navigate to).*(?:todos?|to-dos?)/i.test(lowerInput)) {
+    return {
+      action: "navigate",
+      entity: "todos",
       params: {},
     };
   }

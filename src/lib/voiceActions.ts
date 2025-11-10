@@ -191,13 +191,42 @@ export const executeVoiceAction = (
     }
   }
 
-  // Analytics action
-  if (entity === "analytics" && action === "show") {
-    onNavigate?.("analytics");
-    const completedTasks = tasks.filter((t) => t.completed).length;
-    const totalTasks = tasks.length;
-    const completedHabits = habits.reduce((acc, h) => acc + h.completions.length, 0);
-    return `Showing analytics. You've completed ${completedTasks} out of ${totalTasks} tasks, and logged ${completedHabits} habit completions.`;
+  // Navigation actions
+  if (action === "navigate") {
+    if (entity === "analytics") {
+      onNavigate?.("analytics");
+      const completedTasks = tasks.filter((t) => t.completed).length;
+      const totalTasks = tasks.length;
+      const completedHabits = habits.reduce((acc, h) => acc + h.completions.length, 0);
+      return `Opening analytics. You've completed ${completedTasks} out of ${totalTasks} tasks, and logged ${completedHabits} habit completions.`;
+    }
+    
+    if (entity === "notes") {
+      onNavigate?.("notes");
+      return "Opening notes.";
+    }
+    
+    if (entity === "calendar") {
+      onNavigate?.("calendar");
+      return "Opening calendar.";
+    }
+    
+    if (entity === "tasks") {
+      onNavigate?.("tasks");
+      const activeTasks = tasks.filter((t) => !t.completed);
+      return `Opening tasks. You have ${activeTasks.length} active tasks.`;
+    }
+    
+    if (entity === "habits") {
+      onNavigate?.("habits");
+      return `Opening habits. You have ${habits.length} habits set up.`;
+    }
+    
+    if (entity === "todos") {
+      onNavigate?.("todos");
+      const activeTodos = todos.filter((t) => !t.completed);
+      return `Opening todos. You have ${activeTodos.length} active todos.`;
+    }
   }
 
   // Search action
@@ -209,7 +238,7 @@ export const executeVoiceAction = (
 
   // Help action
   if (action === "help") {
-    return "I can help you create tasks and habits, complete todos, start timers, show analytics, and more. Try saying 'create a task for tomorrow', 'complete my workout habit', or 'start timer for studying'.";
+    return "I can help you create tasks, habits, and todos, complete them, start timers, and navigate around. Try saying 'create a task for tomorrow', 'complete my workout habit', 'open notes', 'show calendar', or 'go to analytics'.";
   }
 
   // Unknown command
