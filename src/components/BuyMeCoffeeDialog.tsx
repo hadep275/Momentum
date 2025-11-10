@@ -5,6 +5,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 
 interface BuyMeCoffeeDialogProps {
   open: boolean;
@@ -21,12 +22,17 @@ export function BuyMeCoffeeDialog({ open, onOpenChange }: BuyMeCoffeeDialogProps
             Thank you for your support! Your contribution helps keep Momentum running and improving.
           </DialogDescription>
         </DialogHeader>
-        <div className="flex-1 w-full h-full px-6 pb-6">
-          <iframe
-            src="https://www.buymeacoffee.com/Momentumapp"
-            className="w-full h-full rounded-lg border border-border"
-            title="Buy Me a Coffee"
-          />
+        <div className="flex flex-col items-center gap-4 px-6 pb-6">
+          <p className="text-center text-muted-foreground">
+            Your support means everything! Click below to buy me a coffee and help keep Momentum growing.
+          </p>
+          <Button 
+            onClick={() => window.open('https://www.buymeacoffee.com/Momentumapp', '_blank')}
+            size="lg"
+            className="w-full max-w-xs"
+          >
+            Open Buy Me a Coffee ☕
+          </Button>
         </div>
       </DialogContent>
     </Dialog>
