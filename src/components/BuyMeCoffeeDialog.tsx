@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 
 interface BuyMeCoffeeDialogProps {
   open: boolean;
@@ -6,24 +6,51 @@ interface BuyMeCoffeeDialogProps {
 }
 
 export function BuyMeCoffeeDialog({ open, onOpenChange }: BuyMeCoffeeDialogProps) {
+  const attempts = useRef(0);
+
   useEffect(() => {
-    if (open && window.BMC) {
-      // Trigger the Buy Me a Coffee widget
-      window.BMC.openWidget();
-      // Close our dialog immediately since the widget will handle the UI
-      onOpenChange(false);
-    }
+    if (!open) return;
+
+    const tryOpenWidget = () => {
+      // Try common selectors used by BMC's floating launcher
+      const selectors = [
+        "#bmc-wbtn",
+        "div[id^='bmc-wbtn']",
+        "a[href*='buymeacoffee'][class*='floating']",
+        "div[class*='bmc-'][class*='floating']",
+      ];
+
+      for (const sel of selectors) {
+        const el = document.querySelector(sel) as HTMLElement | null;
+        if (el) {
+          el.click();
+          return true;
+        }
+      }
+
+      return false;
+    };
+
+    const openNow = () => {
+      const opened = tryOpenWidget();
+      attempts.current++;
+      if (!opened && attempts.current < 8) {
+        // Retry a few times to allow the script to initialize
+        setTimeout(openNow, 200);
+      } else {
+        // Close our dialog either way to avoid trapping the UI
+        onOpenChange(false);
+      }
+    };
+
+    openNow();
+
+    return () => {
+      attempts.current = 0;
+    };
   }, [open, onOpenChange]);
 
-  // This component doesn't render anything visible - it just triggers the widget
+  // No visible UI; this component just triggers the widget programmatically
   return null;
 }
 
-// Extend window type to include BMC
-declare global {
-  interface Window {
-    BMC?: {
-      openWidget: () => void;
-    };
-  }
-}
