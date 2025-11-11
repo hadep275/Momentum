@@ -2,9 +2,11 @@ import { Card } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import { CategoryBadge } from "@/components/CategoryBadge";
-import { Pencil, Trash2, Clock } from "lucide-react";
+import { Pencil, Trash2, Clock, CalendarPlus } from "lucide-react";
 import { Habit } from "@/types/task";
 import { format } from "date-fns";
+import { generateHabitICS, exportSingleItem } from "@/lib/calendarExport";
+import { toast } from "@/hooks/use-toast";
 
 interface HabitItemProps {
   habit: Habit;
@@ -32,6 +34,19 @@ export const HabitItem = ({
   onEdit, 
   onDelete 
 }: HabitItemProps) => {
+  const handleExportToCalendar = async () => {
+    const icsContent = generateHabitICS(habit);
+    const filename = `${habit.title.replace(/[^a-z0-9]/gi, '_')}.ics`;
+    const success = await exportSingleItem(icsContent, filename, habit.title);
+    
+    if (success) {
+      toast({
+        title: "Habit added to calendar!",
+        description: "Your habit has been exported to your calendar app.",
+      });
+    }
+  };
+
   return (
     <Card className="p-4 hover:border-gold/50 transition-colors">
       <div className="flex items-center gap-3">
@@ -67,6 +82,15 @@ export const HabitItem = ({
             className="h-8 w-8 text-muted-foreground hover:text-foreground"
           >
             <Pencil className="h-4 w-4" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={handleExportToCalendar}
+            title="Add to calendar"
+            className="h-8 w-8 text-muted-foreground hover:text-foreground"
+          >
+            <CalendarPlus className="h-4 w-4" />
           </Button>
           <Button
             variant="ghost"

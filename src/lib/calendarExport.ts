@@ -169,6 +169,19 @@ export const shareCalendarEvent = async (content: string, title: string) => {
   return false;
 };
 
+// Export single item (task or habit) - handles mobile share and desktop download
+export const exportSingleItem = async (content: string, filename: string, title: string): Promise<boolean> => {
+  // Try Web Share API first (mobile)
+  if (navigator.share && /android|iphone|ipad|ipod/i.test(navigator.userAgent)) {
+    const shared = await shareCalendarEvent(content, title);
+    if (shared) return true;
+  }
+  
+  // Fallback to download (desktop or share failed)
+  downloadICS(content, filename);
+  return true;
+};
+
 // Generate Google Calendar URL
 export const generateGoogleCalendarURL = (task: Task): string => {
   const start = new Date(task.dueDate);

@@ -4,13 +4,15 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
-import { ChevronDown, ChevronUp, Trash2, Clock, Calendar, AlertCircle, Pencil } from "lucide-react";
+import { ChevronDown, ChevronUp, Trash2, Clock, Calendar, AlertCircle, Pencil, CalendarPlus } from "lucide-react";
 import { Task } from "@/types/task";
 import { ChecklistItem } from "@/components/ChecklistItem";
 import { CategoryBadge } from "@/components/CategoryBadge";
 import { TagBadge } from "@/components/TagBadge";
 import { EditTaskDialog } from "@/components/EditTaskDialog";
 import { formatDistanceToNow, isPast, differenceInDays, format, addDays, addWeeks, addMonths } from "date-fns";
+import { generateTaskICS, exportSingleItem } from "@/lib/calendarExport";
+import { toast } from "@/hooks/use-toast";
 
 interface TaskItemProps {
   task: Task;
@@ -184,6 +186,19 @@ export const TaskItem = ({ task, onUpdate, onDelete, existingTags = [], onUpdate
   const dueDateStatus = getDueDateStatus();
   const priorityConfig = getPriorityConfig();
 
+  const handleExportToCalendar = async () => {
+    const icsContent = generateTaskICS(task);
+    const filename = `${task.title.replace(/[^a-z0-9]/gi, '_')}.ics`;
+    const success = await exportSingleItem(icsContent, filename, task.title);
+    
+    if (success) {
+      toast({
+        title: "Task added to calendar!",
+        description: "Your task has been exported to your calendar app.",
+      });
+    }
+  };
+
   return (
     <Card className="p-4 hover:shadow-xl transition-all border-2 border-gold bg-card shadow-lg shadow-primary/20">
       <div className="space-y-3">
@@ -244,6 +259,14 @@ export const TaskItem = ({ task, onUpdate, onDelete, existingTags = [], onUpdate
             onClick={() => setIsEditDialogOpen(true)}
           >
             <Pencil className="w-4 h-4" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={handleExportToCalendar}
+            title="Add to calendar"
+          >
+            <CalendarPlus className="w-4 h-4" />
           </Button>
           <Button
             variant="ghost"
