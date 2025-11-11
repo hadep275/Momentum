@@ -128,6 +128,8 @@ export const parseCommand = (input: string): ParsedCommand => {
     const titleMatch = input.match(/(?:habit|add|create|make|new)\s+(.+?)(?:\s+(?:on|for|at|every|category)|\s*$)/i);
     let title = titleMatch ? titleMatch[1].trim() : "New Habit";
     
+    // Remove phrases like "a habit for", "a habit called", "habit for", etc.
+    title = title.replace(/^(?:a\s+)?(?:habit|task|todo|to-do)\s+(?:for|called|named)\s+/i, "");
     // Remove common leading prepositions
     title = title.replace(/^(for|to|with|about|regarding)\s+/i, "");
 
@@ -159,6 +161,8 @@ export const parseCommand = (input: string): ParsedCommand => {
     const titleMatch = input.match(/(?:todo|to-do|to do|add|create|make|new)\s+(.+)/i);
     let title = titleMatch ? titleMatch[1].trim() : "New Todo";
     
+    // Remove phrases like "a todo for", "a task for", "todo for", etc.
+    title = title.replace(/^(?:a\s+)?(?:habit|task|todo|to-do)\s+(?:for|called|named)\s+/i, "");
     // Remove common leading prepositions
     title = title.replace(/^(for|to|with|about|regarding)\s+/i, "");
 
@@ -185,6 +189,8 @@ export const parseCommand = (input: string): ParsedCommand => {
     const titleMatch = input.match(/(?:task|add|create|make|new)\s+(.+?)(?:\s+(?:for|due|on|by|at|with|priority|category|tag)|\s*$)/i);
     let title = titleMatch ? titleMatch[1].trim() : "New Task";
     
+    // Remove phrases like "a task for", "task for", "a habit for", etc.
+    title = title.replace(/^(?:a\s+)?(?:habit|task|todo|to-do)\s+(?:for|called|named)\s+/i, "");
     // Remove common leading prepositions
     title = title.replace(/^(for|to|with|about|regarding)\s+/i, "");
 

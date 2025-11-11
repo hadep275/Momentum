@@ -58,7 +58,7 @@ export const executeVoiceAction = (
         createdAt: new Date(),
       };
       setTasks([...tasks, newTask]);
-      return `Task "${params.title}" created successfully for ${params.dueDate.toLocaleDateString()}.`;
+      return `Task "${params.title}" created successfully for ${params.dueDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}.`;
     }
 
     if (action === "complete") {
