@@ -18,6 +18,7 @@ import { useNotificationScheduler } from "@/hooks/useNotificationScheduler";
 import { toast } from "sonner";
 import momentumLogo from "@/assets/momentum-logo.png";
 import { format } from "date-fns";
+import { syncLoad, syncSave } from "@/lib/browserSync";
 
 const TASKS_STORAGE_KEY = "momentum-tasks";
 const HABITS_STORAGE_KEY = "momentum-habits";
@@ -75,94 +76,78 @@ const Index = () => {
     return stored || "default";
   });
 
-  const [tasks, setTasks] = useState<Task[]>(() => {
-    // Load tasks from localStorage on initial render
-    const stored = localStorage.getItem(TASKS_STORAGE_KEY);
-    if (stored) {
-      try {
-        const parsed = JSON.parse(stored);
-        // Convert date strings back to Date objects
-        return parsed.map((task: any) => ({
-          ...task,
-          priority: task.priority || "medium", // Default to medium if missing
-          createdAt: new Date(task.createdAt),
-          dueDate: task.dueDate ? new Date(task.dueDate) : new Date(), // Default to today if missing
-        }));
-      } catch (e) {
-        console.error("Failed to parse stored tasks:", e);
-        return [];
-      }
-    }
-    return [];
-  });
+  const [tasks, setTasks] = useState<Task[]>([]);
 
-  const [habits, setHabits] = useState<Habit[]>(() => {
-    // Load habits from localStorage on initial render
-    const stored = localStorage.getItem(HABITS_STORAGE_KEY);
-    if (stored) {
+  const [habits, setHabits] = useState<Habit[]>([]);
+
+  const [todos, setTodos] = useState<ToDo[]>([]);
+
+  const [notes, setNotes] = useState<Note[]>([]);
+
+  // Load data from browser sync on mount
+  useEffect(() => {
+    const loadData = async () => {
       try {
-        const parsed = JSON.parse(stored);
-        return parsed.map((habit: any) => ({
+        // Load tasks
+        const loadedTasks = await syncLoad<any[]>(TASKS_STORAGE_KEY, []);
+        setTasks(loadedTasks.map((task: any) => ({
+          ...task,
+          priority: task.priority || "medium",
+          createdAt: new Date(task.createdAt),
+          dueDate: task.dueDate ? new Date(task.dueDate) : new Date(),
+        })));
+
+        // Load habits
+        const loadedHabits = await syncLoad<any[]>(HABITS_STORAGE_KEY, []);
+        setHabits(loadedHabits.map((habit: any) => ({
           ...habit,
           createdAt: new Date(habit.createdAt),
-        }));
-      } catch (e) {
-        console.error("Failed to parse stored habits:", e);
-        return [];
-      }
-    }
-    return [];
-  });
+        })));
 
-  const [todos, setTodos] = useState<ToDo[]>(() => {
-    // Load todos from localStorage on initial render
-    const stored = localStorage.getItem(TODOS_STORAGE_KEY);
-    if (stored) {
-      try {
-        const parsed = JSON.parse(stored);
-        return parsed.map((todo: any) => ({
+        // Load todos
+        const loadedTodos = await syncLoad<any[]>(TODOS_STORAGE_KEY, []);
+        setTodos(loadedTodos.map((todo: any) => ({
           ...todo,
           createdAt: new Date(todo.createdAt),
-        }));
-      } catch (e) {
-        console.error("Failed to parse stored todos:", e);
-        return [];
-      }
-    }
-    return [];
-  });
+        })));
 
-  const [notes, setNotes] = useState<Note[]>(() => {
-    const stored = localStorage.getItem(NOTES_STORAGE_KEY);
-    if (stored) {
-      try {
-        return JSON.parse(stored);
-      } catch (e) {
-        console.error("Failed to parse stored notes:", e);
-        return [];
+        // Load notes
+        const loadedNotes = await syncLoad<Note[]>(NOTES_STORAGE_KEY, []);
+        setNotes(loadedNotes);
+      } catch (error) {
+        console.error("Failed to load data from browser sync:", error);
       }
-    }
-    return [];
-  });
+    };
 
-  // Save tasks to localStorage whenever they change
+    loadData();
+  }, []);
+
+  // Save tasks to localStorage and browser sync whenever they change
   useEffect(() => {
-    localStorage.setItem(TASKS_STORAGE_KEY, JSON.stringify(tasks));
+    if (tasks.length > 0 || localStorage.getItem(TASKS_STORAGE_KEY)) {
+      syncSave(TASKS_STORAGE_KEY, tasks);
+    }
   }, [tasks]);
 
-  // Save habits to localStorage whenever they change
+  // Save habits to localStorage and browser sync whenever they change
   useEffect(() => {
-    localStorage.setItem(HABITS_STORAGE_KEY, JSON.stringify(habits));
+    if (habits.length > 0 || localStorage.getItem(HABITS_STORAGE_KEY)) {
+      syncSave(HABITS_STORAGE_KEY, habits);
+    }
   }, [habits]);
 
-  // Save todos to localStorage whenever they change
+  // Save todos to localStorage and browser sync whenever they change
   useEffect(() => {
-    localStorage.setItem(TODOS_STORAGE_KEY, JSON.stringify(todos));
+    if (todos.length > 0 || localStorage.getItem(TODOS_STORAGE_KEY)) {
+      syncSave(TODOS_STORAGE_KEY, todos);
+    }
   }, [todos]);
 
-  // Save notes to localStorage whenever they change
+  // Save notes to localStorage and browser sync whenever they change
   useEffect(() => {
-    localStorage.setItem(NOTES_STORAGE_KEY, JSON.stringify(notes));
+    if (notes.length > 0 || localStorage.getItem(NOTES_STORAGE_KEY)) {
+      syncSave(NOTES_STORAGE_KEY, notes);
+    }
   }, [notes]);
 
   // Save settings to localStorage whenever they change
