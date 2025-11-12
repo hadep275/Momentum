@@ -2,8 +2,10 @@ import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ChevronLeft, ChevronRight, Clock, Pencil, Trash2 } from "lucide-react";
+import { ChevronLeft, ChevronRight, Clock, Pencil, Trash2, CalendarPlus } from "lucide-react";
 import { Task, Habit, TASK_CATEGORIES } from "@/types/task";
+import { generateTaskICS, generateHabitICS, exportSingleItem } from "@/lib/calendarExport";
+import { toast } from "@/hooks/use-toast";
 import {
   startOfMonth,
   endOfMonth,
@@ -110,6 +112,32 @@ export const Calendar = ({ tasks, habits, onUpdateTasks, onUpdateHabits }: Calen
 
   const handleDeleteHabit = (habitId: string) => {
     onUpdateHabits(habits.filter((h) => h.id !== habitId));
+  };
+
+  const handleExportTask = async (task: Task) => {
+    const icsContent = generateTaskICS(task);
+    const filename = `${task.title.replace(/[^a-z0-9]/gi, '_')}.ics`;
+    const success = await exportSingleItem(icsContent, filename, task.title);
+    
+    if (success) {
+      toast({
+        title: "Task added to calendar!",
+        description: "Your task has been exported to your calendar app.",
+      });
+    }
+  };
+
+  const handleExportHabit = async (habit: Habit) => {
+    const icsContent = generateHabitICS(habit);
+    const filename = `${habit.title.replace(/[^a-z0-9]/gi, '_')}.ics`;
+    const success = await exportSingleItem(icsContent, filename, habit.title);
+    
+    if (success) {
+      toast({
+        title: "Habit added to calendar!",
+        description: "Your habit has been exported to your calendar app.",
+      });
+    }
   };
 
   const selectedDateTasks = selectedDate ? getTasksForDate(selectedDate) : [];
@@ -343,6 +371,15 @@ export const Calendar = ({ tasks, habits, onUpdateTasks, onUpdateHabits }: Calen
                             <Button
                               variant="ghost"
                               size="icon"
+                              className="h-8 w-8"
+                              onClick={() => handleExportTask(task)}
+                              title="Add to calendar"
+                            >
+                              <CalendarPlus className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="icon"
                               className="h-8 w-8 text-destructive hover:text-destructive"
                               onClick={() => handleDeleteTask(task.id)}
                             >
@@ -424,6 +461,15 @@ export const Calendar = ({ tasks, habits, onUpdateTasks, onUpdateHabits }: Calen
                                 onClick={() => setEditingHabit(habit)}
                               >
                                 <Pencil className="h-4 w-4" />
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-8 w-8"
+                                onClick={() => handleExportHabit(habit)}
+                                title="Add to calendar"
+                              >
+                                <CalendarPlus className="h-4 w-4" />
                               </Button>
                               <Button
                                 variant="ghost"
