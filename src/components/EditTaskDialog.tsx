@@ -351,9 +351,6 @@ export const EditTaskDialog = ({
                 onChange={setAddress}
                 placeholder="Start typing an address..."
               />
-              <p className="text-xs text-muted-foreground">
-                Powered by OpenStreetMap (free, no API key needed)
-              </p>
             </div>
 
             {/* Email */}

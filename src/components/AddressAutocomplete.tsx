@@ -87,49 +87,46 @@ export const AddressAutocomplete = ({ value, onChange, placeholder, id }: Addres
   };
 
   return (
-    <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger asChild>
-        <div className="relative">
-          <Input
-            id={id}
-            value={value}
-            onChange={(e) => handleInputChange(e.target.value)}
-            placeholder={placeholder || "Start typing an address..."}
-            className="pr-8"
-          />
-          <MapPin className="absolute right-2 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+    <div className="relative">
+      <Input
+        id={id}
+        value={value}
+        onChange={(e) => handleInputChange(e.target.value)}
+        placeholder={placeholder || "Start typing an address..."}
+        className="pr-8"
+      />
+      <MapPin className="absolute right-2 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+
+      {/* Suggestions dropdown - only shows when there are suggestions */}
+      {open && suggestions.length > 0 && (
+        <div className="absolute z-50 w-full mt-1 bg-popover border rounded-md shadow-md">
+          <Command>
+            <CommandList>
+              {loading && (
+                <div className="p-4 text-sm text-muted-foreground text-center">
+                  Searching addresses...
+                </div>
+              )}
+              {!loading && suggestions.length > 0 && (
+                <CommandGroup>
+                  {suggestions.map((suggestion) => (
+                    <CommandItem
+                      key={suggestion.place_id}
+                      value={suggestion.display_name}
+                      onSelect={() => handleSelect(suggestion.display_name)}
+                      className="cursor-pointer"
+                    >
+                      <MapPin className="mr-2 h-4 w-4" />
+                      <span className="text-sm">{suggestion.display_name}</span>
+                    </CommandItem>
+                  ))}
+                </CommandGroup>
+              )}
+            </CommandList>
+          </Command>
         </div>
-      </PopoverTrigger>
-      <PopoverContent className="w-[400px] p-0" align="start">
-        <Command>
-          <CommandList>
-            {loading && (
-              <div className="p-4 text-sm text-muted-foreground text-center">
-                Searching addresses...
-              </div>
-            )}
-            {!loading && suggestions.length === 0 && value.length >= 3 && (
-              <CommandEmpty>No addresses found.</CommandEmpty>
-            )}
-            {!loading && suggestions.length > 0 && (
-              <CommandGroup>
-                {suggestions.map((suggestion) => (
-                  <CommandItem
-                    key={suggestion.place_id}
-                    value={suggestion.display_name}
-                    onSelect={() => handleSelect(suggestion.display_name)}
-                    className="cursor-pointer"
-                  >
-                    <MapPin className="mr-2 h-4 w-4" />
-                    <span className="text-sm">{suggestion.display_name}</span>
-                  </CommandItem>
-                ))}
-              </CommandGroup>
-            )}
-          </CommandList>
-        </Command>
-      </PopoverContent>
-    </Popover>
+      )}
+    </div>
   );
 };
 
