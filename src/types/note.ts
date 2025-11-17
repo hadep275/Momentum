@@ -5,4 +5,5 @@ export interface Note {
   isPinned: boolean;
   createdAt: string;
   updatedAt: string;
+  photos?: string[]; // Array of photo URIs from camera
 }

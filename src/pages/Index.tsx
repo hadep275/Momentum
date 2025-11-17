@@ -19,6 +19,7 @@ import { toast } from "sonner";
 import momentumLogo from "@/assets/momentum-logo.png";
 import { format } from "date-fns";
 import { syncLoad, syncSave } from "@/lib/browserSync";
+import { requestNotificationPermissions, rescheduleAllNotifications } from "@/lib/notifications";
 
 const TASKS_STORAGE_KEY = "momentum-tasks";
 const HABITS_STORAGE_KEY = "momentum-habits";
@@ -117,6 +118,12 @@ const Index = () => {
         setNotes(loadedNotes);
 
         setIsDataLoaded(true);
+
+        // Request notification permissions and schedule notifications
+        const hasPermission = await requestNotificationPermissions();
+        if (hasPermission) {
+          await rescheduleAllNotifications(loadedTasks, loadedHabits);
+        }
       } catch (error) {
         console.error("Failed to load data:", error);
         setIsDataLoaded(true);
@@ -131,6 +138,8 @@ const Index = () => {
     if (!isDataLoaded) return; // Don't save until initial load is complete
     if (tasks.length > 0 || localStorage.getItem(TASKS_STORAGE_KEY)) {
       syncSave(TASKS_STORAGE_KEY, tasks);
+      // Reschedule notifications when tasks change
+      rescheduleAllNotifications(tasks, habits);
     }
   }, [tasks, isDataLoaded]);
 
@@ -139,6 +148,8 @@ const Index = () => {
     if (!isDataLoaded) return; // Don't save until initial load is complete
     if (habits.length > 0 || localStorage.getItem(HABITS_STORAGE_KEY)) {
       syncSave(HABITS_STORAGE_KEY, habits);
+      // Reschedule notifications when habits change
+      rescheduleAllNotifications(tasks, habits);
     }
   }, [habits, isDataLoaded]);
 

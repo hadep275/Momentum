@@ -3,9 +3,11 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { VoiceTextarea } from "@/components/VoiceTextarea";
-import { Pin, Trash2, Maximize2, Minimize2 } from "lucide-react";
+import { Pin, Trash2, Maximize2, Minimize2, Camera, X } from "lucide-react";
 import { Note } from "@/types/note";
 import { cn } from "@/lib/utils";
+import { Camera as CapCamera, CameraResultType, CameraSource } from "@capacitor/camera";
+import { useToast } from "@/hooks/use-toast";
 
 interface NoteItemProps {
   note: Note;
@@ -18,7 +20,9 @@ export const NoteItem = ({ note, onUpdate, onDelete }: NoteItemProps) => {
   const [content, setContent] = useState(note.content);
   const [saveTimeout, setSaveTimeout] = useState<NodeJS.Timeout | null>(null);
   const [isExpanded, setIsExpanded] = useState(false);
+  const [photos, setPhotos] = useState<string[]>(note.photos || []);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const { toast } = useToast();
 
   // Auto-save functionality
   const autoSave = useCallback(() => {
@@ -26,20 +30,21 @@ export const NoteItem = ({ note, onUpdate, onDelete }: NoteItemProps) => {
       clearTimeout(saveTimeout);
     }
     const timeout = setTimeout(() => {
-      onUpdate(note.id, { 
-        title, 
+      onUpdate(note.id, {
+        title,
         content,
+        photos,
         updatedAt: new Date().toISOString()
       });
     }, 500);
     setSaveTimeout(timeout);
-  }, [title, content, note.id, onUpdate, saveTimeout]);
+  }, [title, content, photos, note.id, onUpdate, saveTimeout]);
 
   useEffect(() => {
-    if (title !== note.title || content !== note.content) {
+    if (title !== note.title || content !== note.content || JSON.stringify(photos) !== JSON.stringify(note.photos || [])) {
       autoSave();
     }
-  }, [title, content]);
+  }, [title, content, photos]);
 
   useEffect(() => {
     return () => {
@@ -64,6 +69,37 @@ export const NoteItem = ({ note, onUpdate, onDelete }: NoteItemProps) => {
 
   const toggleExpand = () => {
     setIsExpanded(!isExpanded);
+  };
+
+  const takePicture = async () => {
+    try {
+      const image = await CapCamera.getPhoto({
+        quality: 90,
+        allowEditing: true,
+        resultType: CameraResultType.Uri,
+        source: CameraSource.Camera
+      });
+
+      if (image.webPath) {
+        setPhotos([...photos, image.webPath]);
+        toast({
+          title: "Photo added!",
+          description: "Photo attached to note successfully.",
+        });
+      }
+    } catch (error: any) {
+      if (error.message !== "User cancelled photos app") {
+        toast({
+          title: "Camera error",
+          description: "Could not access camera. Make sure permissions are granted.",
+          variant: "destructive",
+        });
+      }
+    }
+  };
+
+  const removePhoto = (index: number) => {
+    setPhotos(photos.filter((_, i) => i !== index));
   };
 
   // Auto-resize textarea based on content
@@ -106,6 +142,14 @@ export const NoteItem = ({ note, onUpdate, onDelete }: NoteItemProps) => {
         <Button
           variant="ghost"
           size="icon"
+          onClick={takePicture}
+          title="Add photo"
+        >
+          <Camera className="h-4 w-4" />
+        </Button>
+        <Button
+          variant="ghost"
+          size="icon"
           onClick={togglePin}
           className={cn(note.isPinned && "text-primary")}
         >
@@ -133,6 +177,29 @@ export const NoteItem = ({ note, onUpdate, onDelete }: NoteItemProps) => {
         )}
         style={!isExpanded ? { height: 'auto' } : undefined}
       />
+
+      {/* Photo Gallery */}
+      {photos.length > 0 && (
+        <div className="grid grid-cols-3 gap-2">
+          {photos.map((photo, index) => (
+            <div key={index} className="relative group">
+              <img
+                src={photo}
+                alt={`Note photo ${index + 1}`}
+                className="w-full h-24 object-cover rounded-md"
+              />
+              <Button
+                variant="destructive"
+                size="icon"
+                className="absolute top-1 right-1 h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
+                onClick={() => removePhoto(index)}
+              >
+                <X className="h-3 w-3" />
+              </Button>
+            </div>
+          ))}
+        </div>
+      )}
 
       <div className="flex items-center justify-between text-xs text-muted-foreground">
         <span>Updated {new Date(note.updatedAt).toLocaleString()}</span>

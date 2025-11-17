@@ -13,6 +13,7 @@ import { EditTaskDialog } from "@/components/EditTaskDialog";
 import { formatDistanceToNow, isPast, differenceInDays, format, addDays, addWeeks, addMonths } from "date-fns";
 import { generateTaskICS, exportSingleItem } from "@/lib/calendarExport";
 import { toast } from "@/hooks/use-toast";
+import { Haptics, ImpactStyle } from "@capacitor/haptics";
 
 interface TaskItemProps {
   task: Task;
@@ -59,13 +60,22 @@ export const TaskItem = ({ task, onUpdate, onDelete, existingTags = [], onUpdate
     }
   };
 
-  const handleToggleComplete = () => {
+  const handleToggleComplete = async () => {
     const isCompleting = !task.completed;
-    
+
+    // Haptic feedback when completing a task
+    if (isCompleting) {
+      try {
+        await Haptics.impact({ style: ImpactStyle.Medium });
+      } catch (error) {
+        // Haptics not available (web browser), silently fail
+      }
+    }
+
     // If completing a recurring task, create a new instance
     if (isCompleting && task.recurrence && onUpdateTasks && allTasks) {
       const nextDueDate = calculateNextDueDate(new Date(task.dueDate), task.recurrence);
-      
+
       const newRecurringTask: Task = {
         ...task,
         id: crypto.randomUUID(),
@@ -78,9 +88,9 @@ export const TaskItem = ({ task, onUpdate, onDelete, existingTags = [], onUpdate
           timeSpent: 0
         }))
       };
-      
+
       // Update tasks: mark current as completed, add new recurring task
-      const updatedTasks = allTasks.map(t => 
+      const updatedTasks = allTasks.map(t =>
         t.id === task.id ? { ...task, completed: true } : t
       );
       onUpdateTasks([...updatedTasks, newRecurringTask]);
@@ -217,7 +227,7 @@ export const TaskItem = ({ task, onUpdate, onDelete, existingTags = [], onUpdate
 
         {/* Description */}
         {task.description && (
-          <p className="text-sm text-muted-foreground ml-9">{task.description}</p>
+          <p className="text-sm text-muted-foreground ml-9 whitespace-pre-wrap">{task.description}</p>
         )}
 
         {/* Badges: Priority, Due Date, Recurrence */}
@@ -311,6 +321,64 @@ export const TaskItem = ({ task, onUpdate, onDelete, existingTags = [], onUpdate
                 onUpdate={(updates) => handleUpdateChecklist(checklist.id, updates)}
               />
             ))}
+          </div>
+        )}
+
+        {/* Metadata Section */}
+        {isExpanded && (task.links || task.address || task.email || task.phone) && (
+          <div className="ml-9 space-y-2 pt-2 border-t">
+            <h4 className="text-sm font-semibold text-muted-foreground">Additional Information</h4>
+
+            {task.links && task.links.length > 0 && (
+              <div className="space-y-1">
+                <span className="text-xs font-medium text-muted-foreground">Links:</span>
+                {task.links.map((link, index) => (
+                  <div key={index}>
+                    <a
+                      href={link}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-sm text-primary hover:underline block truncate"
+                    >
+                      {link}
+                    </a>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {task.address && (
+              <div className="space-y-1">
+                <span className="text-xs font-medium text-muted-foreground">Address:</span>
+                <p className="text-sm">{task.address}</p>
+                <a
+                  href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(task.address)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-xs text-primary hover:underline"
+                >
+                  View on Google Maps
+                </a>
+              </div>
+            )}
+
+            {task.email && (
+              <div className="space-y-1">
+                <span className="text-xs font-medium text-muted-foreground">Email:</span>
+                <a href={`mailto:${task.email}`} className="text-sm text-primary hover:underline block">
+                  {task.email}
+                </a>
+              </div>
+            )}
+
+            {task.phone && (
+              <div className="space-y-1">
+                <span className="text-xs font-medium text-muted-foreground">Phone:</span>
+                <a href={`tel:${task.phone}`} className="text-sm text-primary hover:underline block">
+                  {task.phone}
+                </a>
+              </div>
+            )}
           </div>
         )}
       </div>

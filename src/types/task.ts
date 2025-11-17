@@ -50,6 +50,11 @@ export interface Task {
   completed: boolean;
   createdAt: Date;
   reminderMinutes?: number; // Minutes before due time to remind
+  // Metadata fields
+  links?: string[]; // URLs
+  address?: string; // Physical address
+  email?: string; // Email address
+  phone?: string; // Phone number
 }
 
 export interface Habit {
