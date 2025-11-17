@@ -20,6 +20,7 @@ import { cn } from "@/lib/utils";
 import { TagInput } from "@/components/TagInput";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { TimePicker } from "@/components/TimePicker";
+import { AddressAutocomplete } from "@/components/AddressAutocomplete";
 
 interface CreateTaskDialogProps {
   open: boolean;
@@ -47,6 +48,12 @@ export const CreateTaskDialog = ({
   const [checklists, setChecklists] = useState<string[]>([]);
   const [newChecklistItem, setNewChecklistItem] = useState("");
   const [reminderMinutes, setReminderMinutes] = useState<number | undefined>(undefined);
+  // Metadata fields
+  const [links, setLinks] = useState<string[]>([]);
+  const [newLink, setNewLink] = useState("");
+  const [address, setAddress] = useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
 
   // Update title when dialog opens with initialTitle
   useEffect(() => {
@@ -64,6 +71,17 @@ export const CreateTaskDialog = ({
 
   const handleRemoveChecklistItem = (index: number) => {
     setChecklists(checklists.filter((_, i) => i !== index));
+  };
+
+  const handleAddLink = () => {
+    if (newLink.trim()) {
+      setLinks([...links, newLink.trim()]);
+      setNewLink("");
+    }
+  };
+
+  const handleRemoveLink = (index: number) => {
+    setLinks(links.filter((_, i) => i !== index));
   };
 
   const handleSubmit = () => {
@@ -86,6 +104,11 @@ export const CreateTaskDialog = ({
       })),
       completed: false,
       reminderMinutes,
+      // Metadata fields
+      links: links.length > 0 ? links : undefined,
+      address: address.trim() || undefined,
+      email: email.trim() || undefined,
+      phone: phone.trim() || undefined,
     };
 
     onCreateTask(task);
@@ -102,6 +125,11 @@ export const CreateTaskDialog = ({
     setChecklists([]);
     setNewChecklistItem("");
     setReminderMinutes(undefined);
+    setLinks([]);
+    setNewLink("");
+    setAddress("");
+    setEmail("");
+    setPhone("");
   };
 
   return (
@@ -289,6 +317,93 @@ export const CreateTaskDialog = ({
                 ))}
               </div>
             )}
+          </div>
+
+          {/* Metadata Section */}
+          <div className="space-y-4 border-t pt-4">
+            <h3 className="font-semibold text-sm">Additional Information</h3>
+
+            {/* Links */}
+            <div className="space-y-2">
+              <Label>Links</Label>
+              <div className="flex gap-2">
+                <Input
+                  value={newLink}
+                  onChange={(e) => setNewLink(e.target.value)}
+                  placeholder="https://example.com"
+                  type="url"
+                  onKeyPress={(e) => {
+                    if (e.key === "Enter") {
+                      e.preventDefault();
+                      handleAddLink();
+                    }
+                  }}
+                />
+                <Button type="button" onClick={handleAddLink} size="icon">
+                  <Plus className="w-4 h-4" />
+                </Button>
+              </div>
+              {links.length > 0 && (
+                <div className="space-y-2 mt-2">
+                  {links.map((link, index) => (
+                    <div
+                      key={index}
+                      className="flex items-center justify-between p-2 bg-muted rounded-md"
+                    >
+                      <a href={link} target="_blank" rel="noopener noreferrer" className="text-sm text-primary hover:underline truncate">
+                        {link}
+                      </a>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => handleRemoveLink(index)}
+                      >
+                        <X className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Address with Autocomplete */}
+            <div className="space-y-2">
+              <Label htmlFor="address">Address</Label>
+              <AddressAutocomplete
+                id="address"
+                value={address}
+                onChange={setAddress}
+                placeholder="Start typing an address..."
+              />
+              <p className="text-xs text-muted-foreground">
+                Powered by OpenStreetMap (free, no API key needed)
+              </p>
+            </div>
+
+            {/* Email */}
+            <div className="space-y-2">
+              <Label htmlFor="email">Email</Label>
+              <Input
+                id="email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="contact@example.com"
+              />
+            </div>
+
+            {/* Phone */}
+            <div className="space-y-2">
+              <Label htmlFor="phone">Phone</Label>
+              <Input
+                id="phone"
+                type="tel"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                placeholder="+1 (555) 123-4567"
+              />
+            </div>
           </div>
           </div>
         </ScrollArea>
