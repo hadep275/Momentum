@@ -20,6 +20,7 @@ import { cn } from "@/lib/utils";
 import { TagInput } from "@/components/TagInput";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { TimePicker } from "@/components/TimePicker";
+import { AddressAutocomplete } from "@/components/AddressAutocomplete";
 
 interface EditTaskDialogProps {
   open: boolean;
@@ -341,15 +342,18 @@ export const EditTaskDialog = ({
               )}
             </div>
 
-            {/* Address */}
+            {/* Address with Autocomplete */}
             <div className="space-y-2">
               <Label htmlFor="address">Address</Label>
-              <Input
+              <AddressAutocomplete
                 id="address"
                 value={address}
-                onChange={(e) => setAddress(e.target.value)}
-                placeholder="123 Main St, City, State ZIP"
+                onChange={setAddress}
+                placeholder="Start typing an address..."
               />
+              <p className="text-xs text-muted-foreground">
+                Powered by OpenStreetMap (free, no API key needed)
+              </p>
             </div>
 
             {/* Email */}
