@@ -89,11 +89,8 @@ const Index = () => {
   useEffect(() => {
     const loadData = async () => {
       try {
-        console.log('[Index] Loading all data on mount...');
-
         // Load tasks
         const loadedTasks = await syncLoad<any[]>(TASKS_STORAGE_KEY, []);
-        console.log('[Index] Loaded tasks:', loadedTasks);
         setTasks(loadedTasks.map((task: any) => ({
           ...task,
           priority: task.priority || "medium",
@@ -103,7 +100,6 @@ const Index = () => {
 
         // Load habits
         const loadedHabits = await syncLoad<any[]>(HABITS_STORAGE_KEY, []);
-        console.log('[Index] Loaded habits:', loadedHabits);
         setHabits(loadedHabits.map((habit: any) => ({
           ...habit,
           createdAt: new Date(habit.createdAt),
@@ -111,11 +107,6 @@ const Index = () => {
 
         // Load todos
         const loadedTodos = await syncLoad<any[]>(TODOS_STORAGE_KEY, []);
-        console.log('[Index] Loaded todos:', loadedTodos);
-        console.log('[Index] Setting todos state with:', loadedTodos.map((todo: any) => ({
-          ...todo,
-          createdAt: new Date(todo.createdAt),
-        })));
         setTodos(loadedTodos.map((todo: any) => ({
           ...todo,
           createdAt: new Date(todo.createdAt),
@@ -123,13 +114,11 @@ const Index = () => {
 
         // Load notes
         const loadedNotes = await syncLoad<Note[]>(NOTES_STORAGE_KEY, []);
-        console.log('[Index] Loaded notes:', loadedNotes);
         setNotes(loadedNotes);
 
-        console.log('[Index] All data loaded successfully');
         setIsDataLoaded(true);
       } catch (error) {
-        console.error("Failed to load data from browser sync:", error);
+        console.error("Failed to load data:", error);
         setIsDataLoaded(true);
       }
     };
@@ -156,12 +145,8 @@ const Index = () => {
   // Save todos to localStorage and browser sync whenever they change
   useEffect(() => {
     if (!isDataLoaded) return; // Don't save until initial load is complete
-    console.log('[Index] Todos changed, current todos:', todos);
     if (todos.length > 0 || localStorage.getItem(TODOS_STORAGE_KEY)) {
-      console.log('[Index] Saving todos to storage...');
       syncSave(TODOS_STORAGE_KEY, todos);
-    } else {
-      console.log('[Index] Not saving todos (empty and no existing data)');
     }
   }, [todos, isDataLoaded]);
 

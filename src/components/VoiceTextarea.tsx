@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, forwardRef } from "react";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Mic, MicOff } from "lucide-react";
@@ -9,7 +9,8 @@ interface VoiceTextareaProps extends React.ComponentProps<typeof Textarea> {
   onChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
 }
 
-export const VoiceTextarea = ({ value, onChange, ...props }: VoiceTextareaProps) => {
+export const VoiceTextarea = forwardRef<HTMLTextAreaElement, VoiceTextareaProps>(
+  ({ value, onChange, ...props }, ref) => {
   const [isListening, setIsListening] = useState(false);
   const recognitionRef = useRef<any>(null);
   const baseTextRef = useRef("");
@@ -98,7 +99,7 @@ export const VoiceTextarea = ({ value, onChange, ...props }: VoiceTextareaProps)
 
   return (
     <div className="relative">
-      <Textarea value={value} onChange={onChange} {...props} className="pr-12" />
+      <Textarea ref={ref} value={value} onChange={onChange} {...props} className="pr-12" />
       <Button
         type="button"
         size="icon"
@@ -114,4 +115,6 @@ export const VoiceTextarea = ({ value, onChange, ...props }: VoiceTextareaProps)
       </Button>
     </div>
   );
-};
+});
+
+VoiceTextarea.displayName = "VoiceTextarea";

@@ -1,9 +1,9 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { VoiceTextarea } from "@/components/VoiceTextarea";
-import { Pin, Trash2 } from "lucide-react";
+import { Pin, Trash2, Maximize2, Minimize2 } from "lucide-react";
 import { Note } from "@/types/note";
 import { cn } from "@/lib/utils";
 
@@ -17,6 +17,8 @@ export const NoteItem = ({ note, onUpdate, onDelete }: NoteItemProps) => {
   const [title, setTitle] = useState(note.title);
   const [content, setContent] = useState(note.content);
   const [saveTimeout, setSaveTimeout] = useState<NodeJS.Timeout | null>(null);
+  const [isExpanded, setIsExpanded] = useState(false);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   // Auto-save functionality
   const autoSave = useCallback(() => {
@@ -53,11 +55,29 @@ export const NoteItem = ({ note, onUpdate, onDelete }: NoteItemProps) => {
 
   const handleContentChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setContent(e.target.value);
+    autoResizeTextarea();
   };
 
   const togglePin = () => {
     onUpdate(note.id, { isPinned: !note.isPinned });
   };
+
+  const toggleExpand = () => {
+    setIsExpanded(!isExpanded);
+  };
+
+  // Auto-resize textarea based on content
+  const autoResizeTextarea = useCallback(() => {
+    if (textareaRef.current && !isExpanded) {
+      textareaRef.current.style.height = 'auto';
+      textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
+    }
+  }, [isExpanded]);
+
+  // Auto-resize on content change
+  useEffect(() => {
+    autoResizeTextarea();
+  }, [content, autoResizeTextarea]);
 
   return (
     <Card className={cn(
@@ -74,6 +94,18 @@ export const NoteItem = ({ note, onUpdate, onDelete }: NoteItemProps) => {
         <Button
           variant="ghost"
           size="icon"
+          onClick={toggleExpand}
+          title={isExpanded ? "Collapse" : "Expand"}
+        >
+          {isExpanded ? (
+            <Minimize2 className="h-4 w-4" />
+          ) : (
+            <Maximize2 className="h-4 w-4" />
+          )}
+        </Button>
+        <Button
+          variant="ghost"
+          size="icon"
           onClick={togglePin}
           className={cn(note.isPinned && "text-primary")}
         >
@@ -87,16 +119,21 @@ export const NoteItem = ({ note, onUpdate, onDelete }: NoteItemProps) => {
           <Trash2 className="h-4 w-4" />
         </Button>
       </div>
-      
+
       <VoiceTextarea
+        ref={textareaRef}
         value={content}
         onChange={handleContentChange}
         placeholder="Start typing or use voice input..."
-        className="min-h-[120px] resize-none"
+        className={cn(
+          "resize-none transition-all",
+          isExpanded ? "min-h-[400px] max-h-[600px] overflow-y-auto" : "min-h-[120px] max-h-[300px] overflow-hidden"
+        )}
       />
-      
-      <div className="text-xs text-muted-foreground">
-        Updated {new Date(note.updatedAt).toLocaleString()}
+
+      <div className="flex items-center justify-between text-xs text-muted-foreground">
+        <span>Updated {new Date(note.updatedAt).toLocaleString()}</span>
+        <span className="text-muted-foreground/70">{content.length} characters</span>
       </div>
     </Card>
   );

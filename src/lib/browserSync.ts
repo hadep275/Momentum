@@ -69,8 +69,6 @@ export const syncSave = async <T>(key: string, data: T): Promise<void> => {
  * Load data from localStorage, merge with chrome.storage.sync if available
  */
 export const syncLoad = async <T>(key: string, defaultValue: T): Promise<T> => {
-  console.log(`[syncLoad] Loading ${key}...`);
-
   // Load from localStorage (always available)
   const localData = localStorage.getItem(key);
   let parsedLocalData: T = defaultValue;
@@ -79,16 +77,13 @@ export const syncLoad = async <T>(key: string, defaultValue: T): Promise<T> => {
   if (localData) {
     try {
       parsedLocalData = JSON.parse(localData);
-      console.log(`[syncLoad] Loaded ${key} from localStorage:`, parsedLocalData);
       // Try to get timestamp from a separate key for backwards compatibility
       const timestampKey = key + "_timestamp";
       const storedTimestamp = localStorage.getItem(timestampKey);
       localTimestamp = storedTimestamp ? parseInt(storedTimestamp, 10) : 0;
     } catch (e) {
-      console.error(`[syncLoad] Failed to parse local data for ${key}:`, e);
+      console.error(`Failed to parse data from localStorage:`, e);
     }
-  } else {
-    console.log(`[syncLoad] No data found in localStorage for ${key}, using default:`, defaultValue);
   }
 
   // Try to load from chrome.storage.sync and merge
@@ -100,18 +95,16 @@ export const syncLoad = async <T>(key: string, defaultValue: T): Promise<T> => {
 
       if (syncData && syncData.timestamp > localTimestamp) {
         // Chrome sync data is newer, use it and update localStorage
-        console.log(`[syncLoad] Chrome sync data is newer for ${key}, using it`);
         localStorage.setItem(key, JSON.stringify(syncData.data));
         localStorage.setItem(key + "_timestamp", syncData.timestamp.toString());
         return syncData.data;
       }
     } catch (error) {
-      console.warn(`[syncLoad] Failed to load from browser sync for ${key}:`, error);
+      // Silently fail - sync is optional
     }
   }
 
   // Return local data (either no sync data or local is newer)
-  console.log(`[syncLoad] Returning data for ${key}:`, parsedLocalData);
   return parsedLocalData;
 };
 
