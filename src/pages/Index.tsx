@@ -83,13 +83,17 @@ const Index = () => {
   const [todos, setTodos] = useState<ToDo[]>([]);
 
   const [notes, setNotes] = useState<Note[]>([]);
+  const [isDataLoaded, setIsDataLoaded] = useState(false);
 
   // Load data from browser sync on mount
   useEffect(() => {
     const loadData = async () => {
       try {
+        console.log('[Index] Loading all data on mount...');
+
         // Load tasks
         const loadedTasks = await syncLoad<any[]>(TASKS_STORAGE_KEY, []);
+        console.log('[Index] Loaded tasks:', loadedTasks);
         setTasks(loadedTasks.map((task: any) => ({
           ...task,
           priority: task.priority || "medium",
@@ -99,6 +103,7 @@ const Index = () => {
 
         // Load habits
         const loadedHabits = await syncLoad<any[]>(HABITS_STORAGE_KEY, []);
+        console.log('[Index] Loaded habits:', loadedHabits);
         setHabits(loadedHabits.map((habit: any) => ({
           ...habit,
           createdAt: new Date(habit.createdAt),
@@ -106,6 +111,11 @@ const Index = () => {
 
         // Load todos
         const loadedTodos = await syncLoad<any[]>(TODOS_STORAGE_KEY, []);
+        console.log('[Index] Loaded todos:', loadedTodos);
+        console.log('[Index] Setting todos state with:', loadedTodos.map((todo: any) => ({
+          ...todo,
+          createdAt: new Date(todo.createdAt),
+        })));
         setTodos(loadedTodos.map((todo: any) => ({
           ...todo,
           createdAt: new Date(todo.createdAt),
@@ -113,9 +123,14 @@ const Index = () => {
 
         // Load notes
         const loadedNotes = await syncLoad<Note[]>(NOTES_STORAGE_KEY, []);
+        console.log('[Index] Loaded notes:', loadedNotes);
         setNotes(loadedNotes);
+
+        console.log('[Index] All data loaded successfully');
+        setIsDataLoaded(true);
       } catch (error) {
         console.error("Failed to load data from browser sync:", error);
+        setIsDataLoaded(true);
       }
     };
 
@@ -124,31 +139,39 @@ const Index = () => {
 
   // Save tasks to localStorage and browser sync whenever they change
   useEffect(() => {
+    if (!isDataLoaded) return; // Don't save until initial load is complete
     if (tasks.length > 0 || localStorage.getItem(TASKS_STORAGE_KEY)) {
       syncSave(TASKS_STORAGE_KEY, tasks);
     }
-  }, [tasks]);
+  }, [tasks, isDataLoaded]);
 
   // Save habits to localStorage and browser sync whenever they change
   useEffect(() => {
+    if (!isDataLoaded) return; // Don't save until initial load is complete
     if (habits.length > 0 || localStorage.getItem(HABITS_STORAGE_KEY)) {
       syncSave(HABITS_STORAGE_KEY, habits);
     }
-  }, [habits]);
+  }, [habits, isDataLoaded]);
 
   // Save todos to localStorage and browser sync whenever they change
   useEffect(() => {
+    if (!isDataLoaded) return; // Don't save until initial load is complete
+    console.log('[Index] Todos changed, current todos:', todos);
     if (todos.length > 0 || localStorage.getItem(TODOS_STORAGE_KEY)) {
+      console.log('[Index] Saving todos to storage...');
       syncSave(TODOS_STORAGE_KEY, todos);
+    } else {
+      console.log('[Index] Not saving todos (empty and no existing data)');
     }
-  }, [todos]);
+  }, [todos, isDataLoaded]);
 
   // Save notes to localStorage and browser sync whenever they change
   useEffect(() => {
+    if (!isDataLoaded) return; // Don't save until initial load is complete
     if (notes.length > 0 || localStorage.getItem(NOTES_STORAGE_KEY)) {
       syncSave(NOTES_STORAGE_KEY, notes);
     }
-  }, [notes]);
+  }, [notes, isDataLoaded]);
 
   // Save settings to localStorage whenever they change
   useEffect(() => {
