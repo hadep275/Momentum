@@ -126,9 +126,12 @@ export const NoteItem = ({ note, onUpdate, onDelete }: NoteItemProps) => {
         onChange={handleContentChange}
         placeholder="Start typing or use voice input..."
         className={cn(
-          "resize-none transition-all",
-          isExpanded ? "min-h-[400px] max-h-[600px] overflow-y-auto" : "min-h-[120px] max-h-[300px] overflow-hidden"
+          "transition-all",
+          isExpanded
+            ? "min-h-[400px] h-[400px] max-h-[600px] resize-y overflow-y-auto"
+            : "min-h-[120px] resize-none overflow-hidden"
         )}
+        style={!isExpanded ? { height: 'auto' } : undefined}
       />
 
       <div className="flex items-center justify-between text-xs text-muted-foreground">
